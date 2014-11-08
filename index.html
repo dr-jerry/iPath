@@ -1,0 +1,208 @@
+<html>
+<head>
+<title>Size doesn't matter!</title>
+<link rel="stylesheet" href="css/iscriptdesign.css" type="text/css" media="screen, projection"/>
+<!--script src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.1/jquery.min.js" type="text/javascript"></script-->
+<!--script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.6/jquery-ui.min.js" type="text/javascript"></script-->
+<script type="text/javascript" src="js/jquery-1.6.1-min.js"></script>
+<script type="text/javascript" src="js/jquery-ui-1.8.20.custom.min.js"></script>
+<!-- <script type="text/javascript" src="js/jquery.svg.js"></script> -->
+<script type="text/javascript" src="js/iscriptdesign.js"></script>
+<script type="text/javascript" src="js/svg_functions.js"></script> 
+<script type="text/javascript" src="js/lazyload.js"></script>
+<script type="text/javascript" src="js/menu.js"></script>
+<script type="text/javascript" src="js/iPath.js"></script>
+<script type="text/javascript" src="js/FileSaver.js"></script>
+
+<script type="text/javascript">
+//gac goes here
+
+var urlParams;
+(window.onpopstate = function () {
+    var match,
+        pl     = /\+/g,  // Regex for replacing addition symbol(+) with a space
+        search = /([^&=]+)=?([^&]*)/g,
+        decode = function (s) { return decodeURIComponent(s.replace(pl, " ")); },
+        query  = window.location.search.substring(1);
+
+    urlParams = {};
+    while (match = search.exec(query))
+       urlParams[decode(match[1])] = decode(match[2]);
+})();
+
+$(document).ready(function() {
+        $('#about').click(function() {
+            processText('about');
+        });
+//	$('#designpanel').svg();
+	$('ul, li', $('.isd_menu ul li')).addClass('inactive');
+	$('.isd_menu').initMenu();
+        var position_header = $('#designpanel').offset();
+        $('#draggable').css({ position: "absolute", left: position_header.left + 210, top:position_header.top - 20 });
+        $("#draggable").draggable();
+        $("#draggable").hide();
+        $('#editedit').dialog({ title: "Edit",
+                closeOnEscape: true,
+                draggable: true,
+                modal: true,
+                autoOpen: false, 
+                close: function (event, ui) { $('#editedit .CodeMirror').remove(); },
+
+                show: 'blind', 
+                hide: 'explode'});
+        $('div.ui-dialog-titlebar.ui-corner-all').append($('<a href="#" class="ui-dialog-titlebar-save ui-corner-all reload" role="button"><span class="ui-icon ui-icon-check">save</span></a>'));
+        $("#dropspot").initDrop();
+        $("#lsider").slider({min: 0, max: 10, step:0.1, slide: function (event, ui) {}});
+        if (window.BlobBuilder) {
+          // No change needed - the W3C standard API will be used by default.
+        } 
+        else if (window.MSBlobBuilder) {
+          window.BlobBuilder = window.MSBlobBuilder;
+        }
+        else if (window.WebKitBlobBuilder) {
+          window.BlobBuilder = window.WebKitBlobBuilder;
+        }
+        else if (window.MozBlobBuilder) {
+          window.BlobBuilder = window.MozBlobBuilder;
+        }   
+        else {
+           //blob builder is not supported.
+        }
+//        processLoad('about',true);
+//       timers.queue({
+//           stretchSketch: StretchSketch.load({url: 'iPath/welcome.jsvg', showOnInit: false })
+//           , endTime: 9000
+//           , timePoints: JSON.parse('{"char.red" : " 0: 0,  8800: 254" , "char.stroke": "0: 50, 8500 : 0.0001"}')});
+//       timers.queue({
+//           stretchSketch: StretchSketch.load({url: 'iPath/to.jsvg'
+//           , showOnInit: false})
+//           , endTime: 12000
+//           , timePoints: JSON.parse('{"to.perc": "0:0.001, 10000: 1"}')});
+//       timers.queue({
+//           stretchSketch: StretchSketch.load({url: 'iPath/stretchsketch.jsvg'
+//           , showOnInit: false})
+//           , endTime: 12000
+//           , timePoints: JSON.parse('{"stsk.x": "0:1.5, 2000:1.5, 3000:4, 4000:4.2, 4200:4.1, 4400: 4.4, 5000: 0.2, 5700: 3, 6500: 0.8, 7300: 2.1, 8000: 1.2, 8600: 1.7, 9000:1.5"}')});
+//       timers.queue({
+//           stretchSketch: StretchSketch.load({url: 'animation/iepad.jsvg', showOnInit: false })
+//           , endTime: 9000
+//           , timePoints: JSON.parse('{"iepad.een.x" : " 0: 0, 1000: 80" , "iepad.twee.y": "1000:0, 2000: 40", "iepad.drie.x" : "2000: 0, 3000: 50", "iepad.drie.y" : "2000: 0,3000: -40", "iepad.vier.x" : "3000: 0, 4000: -50", "iepad.vier.y" : "3000: 0, 4000: -40", "iepad.vijf.y": "4000:0, 6000: 30"}')});
+//       timers.queue({
+//           stretchSketch: StretchSketch.load({url: 'stretchbox.jsvg', showOnInit: false })
+//           , endTime: 7000
+//           , timePoints: JSON.parse('{"stretchbox.isd_width" : " 0: 150, 1000: 220" , "stretchbox.depth": "0: 150, 4000:80, 6000: 120", "stretchbox.height" : " 0: 150, 4000:150, 6000: 90"}')});
+//        timers.nextSketch(80);
+//        stretchSketch = StretchSketch.load({url: 'animation/hinge.jsvg', controlPanel: $('#draggable'), edit: true});
+//        stretchSketch = StretchSketch.load({url: 'iPath/testEar.jsvg', controlPanel: $('#draggable'), edit: true});
+//          stretchSketch = StretchSketch.load({url: 'iPath/stool.jsvg', controlPanel: $('#draggable'), edit: true});
+          processText(urlParams['sketch'] || 'iPath/visitekaart.jsvg', true)
+  //        stretchSketch = StretchSketch.load({url: urlParams['sketch'] || 'iPath/visitekaart.jsvg', controlPanel: $('#draggable'), edit: true});
+
+});
+
+function processText(id, processJSVG) {
+    $('#abouttext').remove();
+    if (!/\.jsvg$/.test(id)) {
+        $.ajax({url: id + ".html"
+           , timeout: 2000
+           , datatype: "html"
+           , complete: function(html) {}
+           , success: function(html, status,xreq) {
+               $('<div id="abouttext"></div>').html(html).dialog({autoOpen: false, title: 'About', width: 800, height: 400, position: "150, 200"}).dialog('open');
+             }
+        });
+        id += ".jsvg";
+    }
+	if (processJSVG) stretchSketch = StretchSketch.load({url: id, controlPanel: $('#draggable'), edit: true});
+}
+</script>
+</head>
+<body>
+<div id="draggable" class="ui-widget-content inputpanel">
+	<p>Variables (all in mm)</p>
+</div>
+<div id="editedit"></div>
+
+<div id="header"><div class="headertext"><i>i</i>Scr<i>i</i>pt Des<i>i</i>gn</div>
+<div id="lsider"></div>
+<div id="supported">(iScriptDesign has been tested with Chrome, Firefox, Safari and Opera)</div></div>
+<div class="container">
+<div class="isd_menu designmenu">
+	<ul>
+		<li>
+			About
+			<ul>
+                          <li><a class="extern" href="movie/index.html">The Movie</a></li>
+
+			  <li><a id="about.html" href="#" class="show_graph">Intro</a></li>
+			  <li><a id="news.html" href="#" class="">News</a></li>
+			  <li><a id="credits.jsvg" href="#">Credits</a></li>
+			  <li><a id="contact.jsvg" href="#" class="show_graph">Contact</a></li>
+			</ul>
+		<li>
+			Tutorial
+			<ul>
+			    <li><a id="tutorial/points.html" href="" class="show_graph">Intro &amp; points</a></li>
+			    <li><a id="tutorial/paths.html" href="" class="show_graph">Groups &amp; paths</a></li>
+			    <li><a id="tutorial/parameters.html" href="">Parameters</a></li>
+			    <li><a id="tutorial/scripts.html" href="" class="show_graph">Scripts</a></li>
+			    <li><a id="tutorial/ipath.html" href="" class="show_graph">iPath</a></li>
+			  <li><a id="tutorial/splitbezier.html" href="" class="show_graph">Split Bezier</a></li>
+			</ul>
+		</li>
+		<li>
+			iFabrica
+			<ul>
+    			    <li><a id="iPath/henhouse.jsvg" href="">henhouse</a></li>
+    			    <li><a id="iPath/nachtKast2.html" class="show_graph" href="">Nachtkast</a></li>
+                        </ul>
+                </li>
+		<li>
+			Projects
+			<ul>
+	 	            <li><a id="iPath/stool.html" href="" class="show_graph">Stool</a></li>
+	 	            <li><a id="iPath/tripptrapptop.html" href="" class="show_graph">Tripptrapp Top</a></li>
+ 		            <li><a id="fabmoments/kruidenrondgang.jsvg" href="#">Spice Caroussel</a></li>
+ 	 	            <li><a id="iPath/wineMan.html" href="" class="show_graph">Couch Table</a></li>
+ 		            <li><a id="stretchbox.jsvg" href="#">Stretch Box</a></li>
+		</li>
+
+			</ul>
+                </li>
+      		<li>
+		    Varia
+		    <ul>
+        	 	<li><a id="iPath/arcTest.jsvg" href="#">arcTest</a></li>
+        	 	<li><a id="iPath/to.jsvg" href="#">to</a></li>
+	 	        <li><a id="iPath/cow.jsvg" href="#">cow</a></li>
+		        <li><a id="fabmoments/spiceonballs.html" href="" class="show_graph">Spice On Balls</a></li>
+		        <li><a id="iPath/gear.jsvg" href="" class="show_graph">gear</a></li>
+		        <li><a id="iPath/pensandholes.jsvg" href="" class="show_graph">pen joints</a></li>
+		        <li><a id="iPath/polybezier.jsvg" href="" class="show_graph">poly bezier</a></li>
+		<li>iPath
+		  <ul>
+	 	    <li><a id="iPath/characters.jsvg" href="#">Back to school</a></li>
+	 	    <li><a id="iPath/loop.jsvg" href="#">Turtle Graphics</a></li>
+	 	    <li>visite kaart
+		      <ul><li><a id="iPath/visitekaart.jsvg" href="#">voorkant</a></li>
+			<li><a id="iPath/visitekaart2.jsvg" href="#">achterkant</a></li>
+			<li><a id="iPath/watermerk.jsvg" href="#">watermerk</a></li>
+                        </li></ul>
+		  </ul>
+		    </ul>
+                </li>
+		<li><a class="extern" href="http://www.surveymonkey.com/s/CM233P9" target="_new">Poll</a></li>
+	</ul>
+		<div class="dropspot" id="dropspot"><div class="file-upload"> <input id="file-input" type="file" class="afile"/> </div>
+<div id="other-upload">Drop Spot<div class="image_container isd_drop"></div></div></div>
+
+</div>
+<div id="designpanel">
+<svg>
+</svg>
+</div>
+<div class="clear"></div>
+</div>
+<div id="svgexport" class="text"></div>
+</body>
+</html>

@@ -1,0 +1,66 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+  "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+  <title>iPath Test Runner</title>
+  <link rel="stylesheet" type="text/css" href="css/jasmine.css">
+  <script type="text/javascript" src="js/jasmine.js"></script>
+  <script type="text/javascript" src="js/jasmine-html.js"></script>
+  <script src="../js/jquery-1.6.1-min.js" type="text/javascript"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.1/jquery.min.js" type="text/javascript"></script>
+  <!-- include source files here... -->
+  <script type="text/javascript" src="../js/iPath.js"></script>
+  <script type="text/javascript" src="../js/iScriptDesign.js"></script>
+  <script type="text/javascript" src="../js/svg_functions.js"></script>
+  <script type="text/javascript" src="../js/jquery-1.6.1-min.js"></script>
+  <script type="text/javascript" src="../js/jquery-ui-1.8.14.custom.min.js"></script>
+
+  <!-- include spec files here... -->
+  <script type="text/javascript" src="spec/iPathSpec.js"></script>
+  <script type="text/javascript" src="spec/iScriptDesignSpec.js"></script>
+
+</head>
+<body>
+<h2>iPath's unittest</h2>
+  <div id="draggable"></div>
+
+<script type="text/javascript">
+  jasmine.getEnv().addReporter(new jasmine.TrivialReporter());
+  jasmine.getEnv().execute();
+</script>
+<p>
+Before re-factoring and introducing new functionality, you must secure your accomplishments. A well known way
+of securing code is the use of unit tests: isolating code (functions or methods) and check the result of your
+programming logic against verified output obtained earlier. The greater part of your code is covered by
+unit-testing, the more you're guarded against breaking logic when re-factoring or extending your existing code
+base.</p>
+<p>The logical input for SVG (hence the output of iScriptDesign's functionality) is simple text, easy enough to
+do comparisons against and define unit-tests on them.</p><p>  A few test frameworks for javascript are
+available. IScriptDesign is using Jasmine, at the moment of selection the most vivid project. A typical Jasmin
+unit-test looks like:
+<pre class="programlisting">
+  it ("should form a symmetrical line", function() {
+       expect(symmetry([[{x:30,y:20},{x:20,y:30},{x:40,y:30}]],0)) 
+          .toEqual("c 30 20 20 30 40 30 c 20 0 10 -10 40 -30 "); 
+  }); 
+--{ listing 4a, A unit test }
+</pre>
+<p>
+Although seasoned programmers may find the omission of the well known "assert statements" confusing, I think
+that the "expect(..).toEqual(..)" terminology contributes to readability for the less seasoned
+programmers. When the function "symmetry" is modified and it does not produce the outcome we specified in the
+toEqual() part, this particular unit test fails. You'll be able to identify and locate the problem
+faster. Once the problem is found you should reconsider your code modifications (or the reference outcome for
+your unit test). We can of course also use a unit test for double checking idempotent logic:</p>
+<pre class="programlisting">
+  it ("should check idem-potency", function() { 
+             expect(myPath.rotate(myPath, Math.PI/4).reverse(myPath).dPath(1))
+           .toEqual(myPath.reverse(myPath).rotate(myPath, Math.PI/4).dPath(1)); }); 
+--{ listing 4b Check idem-potency in code. (code will be explained in detail below). }
+</pre>
+<p>
+A unit test may of course also be used to guarantee behaviour of new functionality (introduced below).
+</p>
+
+</body>
+</html>
