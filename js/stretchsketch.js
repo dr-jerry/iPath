@@ -117,11 +117,13 @@ var StretchSketch = (function() {
 		    $('div.svg svg').replaceWith(instance.evalJSVG());
             }
         };
-	var toggleDashboard = function(on) {
+	var toggleDashboard = function(on, element) {
 	    if (on == undefined) {
 		on = !$('.real.slider')[0].slider("option","disabled");
 	    }
 	    $('.real.slider').slider(on ? 'enable' : 'disable');
+	    $('li.dashboard').removeClass('selected');
+	    element.addClass('selected');
 	}
 
         var options = $.extend({
@@ -167,7 +169,7 @@ var StretchSketch = (function() {
 		$('<li class="dashboard" id="model">Model</li>').appendTo($('ul', controlPanelMenu));
 		$("#model", controlPanelMenu).click(function() {
 		    $('#svg-container').show();
-		    toggleDashboard(true);
+		    toggleDashboard(true, $(this));
 		    $('#about').hide();
 		});
 	    }
@@ -175,7 +177,7 @@ var StretchSketch = (function() {
 		$('<li class="dashboard" id="about_menu">About</li>').appendTo($('ul', controlPanelMenu));
 		$("#about_menu", controlPanelMenu).click(function() {
 		    $('#svg-container').hide();
-		    toggleDashboard(false);
+		    toggleDashboard(false, $(this));
 		    $('#about').show();
 		});
 	    }
