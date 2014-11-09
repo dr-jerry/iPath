@@ -29,8 +29,8 @@ function itemHolderClick(urls) {
     $("html, body").animate({ scrollTop: 0 }, "slow");
     $('.playground').css('clear', 'both');
     $('.playground').html( '<div id="model" class="model">' 
-			   + '<div class="dashboard"></div><div id="svg-container" class="svg"><svg></svg></div><div class="goaway"></div></div></div>'
-			   + '<div id="about" class="about"></div>'
+			   + '<div class="dashboard"></div><div id="svg-container" class="svg"><svg></svg></div>'
+			   + '<div class="goaway"></div><div id="about" class="about"></div></div>'
 			   +'</div>');
     $('.playground').css('border', '1px solid black');
     $('.playground').animate({
@@ -117,6 +117,13 @@ var StretchSketch = (function() {
 		    $('div.svg svg').replaceWith(instance.evalJSVG());
             }
         };
+	var toggleDashboard = function(on) {
+	    if (on == undefined) {
+		on = !$('.real.slider')[0].slider("option","disabled");
+	    }
+	    $('.real.slider').slider(on ? 'enable' : 'disable');
+	}
+
         var options = $.extend({
             model: '', jsvg: '', controlPanel: undefined, edit: false, showOnInit: true
             , defaultRenderer: renderer, initRenderer: renderer}, sts || {});
@@ -159,14 +166,16 @@ var StretchSketch = (function() {
 	    if (options["model"]) {
 		$('<li class="dashboard" id="model">Model</li>').appendTo($('ul', controlPanelMenu));
 		$("#model", controlPanelMenu).click(function() {
-		    $('#model').show();
+		    $('#svg-container').show();
+		    toggleDashboard(true);
 		    $('#about').hide();
 		});
 	    }
 	    if (options["about"]) {
 		$('<li class="dashboard" id="about_menu">About</li>').appendTo($('ul', controlPanelMenu));
 		$("#about_menu", controlPanelMenu).click(function() {
-		    $('#model').hide();
+		    $('#svg-container').hide();
+		    toggleDashboard(false);
 		    $('#about').show();
 		});
 	    }
@@ -249,7 +258,7 @@ var StretchSketch = (function() {
 
 	    } else if (control.type === "slider") {
 	        var mySlider = $('<div class="controlline inputline"><div class="inputlabel">' + control.label + ':</div><div class="slider-control-value">' + control.defaultvalue + '</div>'
-				     + '<div id="' + control.id + '"></div></div>');
+				     + '<div id="' + control.id + '" class="slider real"></div></div>');
 	        $("#"+control.id, mySlider)
 		  .slider({ min: parseFloat(control.min)
 		          , max: parseFloat(control.max)
