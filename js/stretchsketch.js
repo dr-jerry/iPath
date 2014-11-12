@@ -500,13 +500,14 @@ function processUrls(urls, processJSVG) {
            , complete: function(html) {}
            , success: function(html, status,xreq) {
                $('.about').append(html);
+	       if (!urls.model) {
+		   $('#svg-container').hide();
+		   $('#about').show();
+	       }
              }
         });
     }
     if (urls.model) {
 	stretchSketch = StretchSketch.load({model: urls.model, controlPanel: $('.dashboard'), edit: true, about: urls.about});
-    } else {
-	    $('#svg-container').hide();
-	    $('#about').show();
-    }
+    } 
 }
