@@ -1667,7 +1667,7 @@ words.g= new iPath().bezier(10, -20, 30, -55, 40, -20).smooth(-1.1, -30, -20, -3
     words.i= new iPath().bezier(10, -30, 20, -45, 15, -37).move(-2,-20).line(5,5).move(-3,15).bezier(7, -10, -12, 90, 7, 50);
 words.e= new iPath().bezier(10, 0, 30, 5, 30, -30).smooth(0.15, -10, -35, -20, 20).smooth(0.6, 0, 35, 20, 20);
 words.l= new iPath().bezier(12, 0, 33, 0, 30, -40).smooth(2.5, -10, -35, -20, 30).smooth(0.6, 0, 35, 20, 20);
-words.b= new iPath().bezier(6, -4, 23, 0, 28, -40).smooth(2.5, -10, -41, -12, 30).smooth(0.7, 19, 23, 22, -4).smooth(1.4, -15, -2, 5, 0);
+words.b= new iPath().bezier(6, -4, 23, 0, 28, -40).smooth(2.5, -10, -41, -12, 30).smooth(0.7, 19, 23, 22, -4).smooth(1.4, -15, -2, 1, 0);
 
 words.f= new iPath().bezier(6, -4, 23, 0, 28, -40).smooth(2.5, -10, -41, -12, 60).smooth(0.7, 19, 23, 9, -14).smooth(1.4, -15, -2, 5, 0);
 
@@ -1676,7 +1676,7 @@ words.k= new iPath().bezier(6, -10, 23, 0, 25, -50).smooth(2.5, -10, -41, -12, 7
 //words.s= new iPath().bezier(60, -50, 39, -46, 38, -42).smooth(0.5, -8, -10, -3, 3).smooth(0.2, -8, -10, -3, 3).smooth(2, 30, 77, -23, 47).smooth(-0.5, 32, 12, 37, 3);
 words.s= new iPath().bezier(5, -7.5, 18, -25, 22,-30).smooth(2.7, -12, -10, 4, 3).smooth(2.2, 25, 50, -5, 45).move(27,-8);//.smooth(0.2, -8, -10, -3, 3).smooth(2, 30, 77, -23, 47).smooth(-0.5, 32, 12, 37, 3);
 words.S= new iPath().bezier(35, -7.5, 10, -90, 49,-80).smooth(-0.9, -35, 35, -12, 45).smooth(1.9, 5, 75, -30, 45).smooth(-0.5,35,5,44,0);//.smooth(0.2, -8, -10, -3, 3).smooth(2, 30, 77, -23, 47).smooth(-0.5, 32, 12, 37, 3);
-words.r= new iPath().bezier(2, -8, 12, 0, 18, -35).smooth(0.4, -20, 12, 35, -5).smooth(-0.4, -22, 60, -13, 60);
+words.r= new iPath().bezier(2, 2, 12, -28, 18, -35).smooth(0.4, -20, 12, 35, -5).smooth(-0.4, -22, 60, -13, 60);
 words.z= new iPath().bezier(2, -8, 12, 0, 18, -35).smooth(0.4, -23, 12, 31, -5).smooth(-0.4, -22, 40, -35, 60).smooth(-0.1, 5 ,-10, 23,-3).smooth(0.1, 0, 10, 10,-10);
 words.p= new iPath().bezier(10, -30, 20, -30, 15, -40).smooth(-0.2, 2, 100, -5, 100).smooth(0.2, 0, -60, 8, -80).smooth(3.3, 35, 90, 0,20).smooth(-0.38,20,10,30,0);
 //words.t= new iPath().bezier(10, -30, 20, -90, 15, -50).smooth(-0.2, -5, 60, -5, 70).smooth(-6, -15, -20, 0, -20);

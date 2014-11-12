@@ -505,5 +505,8 @@ function processUrls(urls, processJSVG) {
     }
     if (urls.model) {
 	stretchSketch = StretchSketch.load({model: urls.model, controlPanel: $('.dashboard'), edit: true, about: urls.about});
+    } else {
+	    $('#svg-container').hide();
+	    $('#about').show();
     }
 }
