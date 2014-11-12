@@ -1,208 +1,64 @@
+<!doctype html>
 <html>
 <head>
-<title>Size doesn't matter!</title>
-<link rel="stylesheet" href="css/iscriptdesign.css" type="text/css" media="screen, projection"/>
-<!--script src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.1/jquery.min.js" type="text/javascript"></script-->
-<!--script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.6/jquery-ui.min.js" type="text/javascript"></script-->
-<script type="text/javascript" src="js/jquery-1.6.1-min.js"></script>
-<script type="text/javascript" src="js/jquery-ui-1.8.20.custom.min.js"></script>
-<!-- <script type="text/javascript" src="js/jquery.svg.js"></script> -->
-<script type="text/javascript" src="js/iscriptdesign.js"></script>
-<script type="text/javascript" src="js/svg_functions.js"></script> 
-<script type="text/javascript" src="js/lazyload.js"></script>
-<script type="text/javascript" src="js/menu.js"></script>
-<script type="text/javascript" src="js/iPath.js"></script>
-<script type="text/javascript" src="js/FileSaver.js"></script>
+  <meta charset="utf-8">
 
-<script type="text/javascript">
-//gac goes here
+  <title>StretchSketch</title>
 
-var urlParams;
-(window.onpopstate = function () {
-    var match,
-        pl     = /\+/g,  // Regex for replacing addition symbol(+) with a space
-        search = /([^&=]+)=?([^&]*)/g,
-        decode = function (s) { return decodeURIComponent(s.replace(pl, " ")); },
-        query  = window.location.search.substring(1);
+  <link rel="stylesheet" href="css/stretchsketch.css" />
 
-    urlParams = {};
-    while (match = search.exec(query))
-       urlParams[decode(match[1])] = decode(match[2]);
-})();
-
-$(document).ready(function() {
-        $('#about').click(function() {
-            processText('about');
-        });
-//	$('#designpanel').svg();
-	$('ul, li', $('.isd_menu ul li')).addClass('inactive');
-	$('.isd_menu').initMenu();
-        var position_header = $('#designpanel').offset();
-        $('#draggable').css({ position: "absolute", left: position_header.left + 210, top:position_header.top - 20 });
-        $("#draggable").draggable();
-        $("#draggable").hide();
-        $('#editedit').dialog({ title: "Edit",
-                closeOnEscape: true,
-                draggable: true,
-                modal: true,
-                autoOpen: false, 
-                close: function (event, ui) { $('#editedit .CodeMirror').remove(); },
-
-                show: 'blind', 
-                hide: 'explode'});
-        $('div.ui-dialog-titlebar.ui-corner-all').append($('<a href="#" class="ui-dialog-titlebar-save ui-corner-all reload" role="button"><span class="ui-icon ui-icon-check">save</span></a>'));
-        $("#dropspot").initDrop();
-        $("#lsider").slider({min: 0, max: 10, step:0.1, slide: function (event, ui) {}});
-        if (window.BlobBuilder) {
-          // No change needed - the W3C standard API will be used by default.
-        } 
-        else if (window.MSBlobBuilder) {
-          window.BlobBuilder = window.MSBlobBuilder;
-        }
-        else if (window.WebKitBlobBuilder) {
-          window.BlobBuilder = window.WebKitBlobBuilder;
-        }
-        else if (window.MozBlobBuilder) {
-          window.BlobBuilder = window.MozBlobBuilder;
-        }   
-        else {
-           //blob builder is not supported.
-        }
-//        processLoad('about',true);
-//       timers.queue({
-//           stretchSketch: StretchSketch.load({url: 'iPath/welcome.jsvg', showOnInit: false })
-//           , endTime: 9000
-//           , timePoints: JSON.parse('{"char.red" : " 0: 0,  8800: 254" , "char.stroke": "0: 50, 8500 : 0.0001"}')});
-//       timers.queue({
-//           stretchSketch: StretchSketch.load({url: 'iPath/to.jsvg'
-//           , showOnInit: false})
-//           , endTime: 12000
-//           , timePoints: JSON.parse('{"to.perc": "0:0.001, 10000: 1"}')});
-//       timers.queue({
-//           stretchSketch: StretchSketch.load({url: 'iPath/stretchsketch.jsvg'
-//           , showOnInit: false})
-//           , endTime: 12000
-//           , timePoints: JSON.parse('{"stsk.x": "0:1.5, 2000:1.5, 3000:4, 4000:4.2, 4200:4.1, 4400: 4.4, 5000: 0.2, 5700: 3, 6500: 0.8, 7300: 2.1, 8000: 1.2, 8600: 1.7, 9000:1.5"}')});
-//       timers.queue({
-//           stretchSketch: StretchSketch.load({url: 'animation/iepad.jsvg', showOnInit: false })
-//           , endTime: 9000
-//           , timePoints: JSON.parse('{"iepad.een.x" : " 0: 0, 1000: 80" , "iepad.twee.y": "1000:0, 2000: 40", "iepad.drie.x" : "2000: 0, 3000: 50", "iepad.drie.y" : "2000: 0,3000: -40", "iepad.vier.x" : "3000: 0, 4000: -50", "iepad.vier.y" : "3000: 0, 4000: -40", "iepad.vijf.y": "4000:0, 6000: 30"}')});
-//       timers.queue({
-//           stretchSketch: StretchSketch.load({url: 'stretchbox.jsvg', showOnInit: false })
-//           , endTime: 7000
-//           , timePoints: JSON.parse('{"stretchbox.isd_width" : " 0: 150, 1000: 220" , "stretchbox.depth": "0: 150, 4000:80, 6000: 120", "stretchbox.height" : " 0: 150, 4000:150, 6000: 90"}')});
-//        timers.nextSketch(80);
-//        stretchSketch = StretchSketch.load({url: 'animation/hinge.jsvg', controlPanel: $('#draggable'), edit: true});
-//        stretchSketch = StretchSketch.load({url: 'iPath/testEar.jsvg', controlPanel: $('#draggable'), edit: true});
-//          stretchSketch = StretchSketch.load({url: 'iPath/stool.jsvg', controlPanel: $('#draggable'), edit: true});
-          processText(urlParams['sketch'] || 'iPath/visitekaart.jsvg', true)
-  //        stretchSketch = StretchSketch.load({url: urlParams['sketch'] || 'iPath/visitekaart.jsvg', controlPanel: $('#draggable'), edit: true});
-
-});
-
-function processText(id, processJSVG) {
-    $('#abouttext').remove();
-    if (!/\.jsvg$/.test(id)) {
-        $.ajax({url: id + ".html"
-           , timeout: 2000
-           , datatype: "html"
-           , complete: function(html) {}
-           , success: function(html, status,xreq) {
-               $('<div id="abouttext"></div>').html(html).dialog({autoOpen: false, title: 'About', width: 800, height: 400, position: "150, 200"}).dialog('open');
-             }
-        });
-        id += ".jsvg";
+  <style>
+    .container {
+      margin: 0 auto;
     }
-	if (processJSVG) stretchSketch = StretchSketch.load({url: id, controlPanel: $('#draggable'), edit: true});
-}
-</script>
+  </style>
+
 </head>
-<body>
-<div id="draggable" class="ui-widget-content inputpanel">
-	<p>Variables (all in mm)</p>
+<body class="stretch-body">
+<div class="panel">
+  <div class="h1">
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" baseProfile="full" viewBox="90 160 1000 300" width="100%" height="100%"><g stroke="red" stroke-width="1" fill="none" transform="scale(2)"><path id="st" d="M 40 200 c 37.250 -7.500 37 -90 73 -80 "/></g><g stroke="red" stroke-width="2" fill="none" transform="scale(2)"><path id="h1" d="M 40.000 200 m 73 -80 c -32.400 -9 -45.500 35 -25.500 45 38 19 -17.500 75 -43.500 45 13 15 33.500 5 44 0 10.500 -5 27.800 -26 33 -60 m -11 20 c 2.800 4 4.200 6 13.100 3 m -2.100 -23 c 10 -10 -43.500 105 -12.500 65 31 -40 16.950 -16.500 33 -50 6.600 -14 -23.600 12 36.500 -5 -24.040 6.800 -40 60 -31 60 9 0 35.100 -17 45 -50 1.575 -5.250 0.500 -35 -26 20 -15.900 33 -10.500 35 14 20 24.500 -15 27.800 -26 33 -60 m -11 20 c 2.800 4 4.200 6 13.100 3 m -2.100 -23 c 10 -10 -43.500 105 -12.500 65 31 -40 51.450 -71.500 50.500 -35 0.350 -24.500 -24 -20 -33 10 -2.700 9 0 40 15.900 27 15.900 -13 28.610 -18.700 52.100 -67 60 -125 2.300 -41 -33 70 21.180 -66.600 40.500 -45 25 -10 -10.075 22.750 1.800 4 2.700 1 0.900 -3 29.130 -37.100 34.300 -41 14.850 -13.500 -9 -10 3.100 3 26.620 28.600 10 50 -18.500 45 m 29.400 -8 c 29.400 -8 26.300 -11 43 -60 42.500 -125 2.300 -41 -33 70 42.360 -133.200 40.500 15 13 -30 11 18 -12 40 17.500 25 29.500 -15 33.450 -11.500 43.500 -45 1.575 -5.250 0.500 -35 -26 20 -15.900 33 -10.500 35 14 20 24.500 -15 27.800 -26 33 -60 m -11 20 c 2.800 4 4.200 6 13.100 3 m -2.100 -23 c 10 -10 -43.500 105 -12.500 65 31 -40 51.450 -71.500 50.500 -35 0.350 -24.500 -24 -20 -33 10 -2.700 9 0 40 15.900 27 15.900 -13 28.610 -18.700 52.100 -67 60 -125 2.300 -41 -33 70 21.180 -66.600 40.500 -45 25 -10 -10.075 22.750 1.800 4 2.700 1"></path></g></svg>
+  </div>
+  <div class="h1-exp">
+    <ul>
+    <li>Design files &amp; product plans</li>
+    <li>For furniture, toys, mechanics &amp; more
+    <li>Customizable in every dimension</li>
+    <li>Ready for laser cutters, cnc routers etc</li>
+  </ul>
+  </div>
 </div>
-<div id="editedit"></div>
+  <div class="playground"></div>
+<div class="panel">
+  <div class="label-line">
+     <ul class="labels"><li class="selected">All</li><li class="selected">CNC</li><li class="selected">Furniture</li><li class="selected">Baby &amp Kids</li><li class="selected">Media</li></ul>
+     <div class="dropspot" id="dropspot"><div class="file-upload"> <input id="file-input" type="file" class="afile"/> </div>
+     <div id="other-upload">Drop Spot<div class="image_container isd_drop"></div></div></div>
+  </div>
+  <div class="container">
+    <div class="item-holder" data-model="iPath/cow.jsvg"><div class="item h2"><svg xmlns="http://www.w3.org/2000/svg" version="1.1" baseProfile="full" viewBox="100 140 500 300" width="100%" height="100%"><g stroke="black" stroke-width="1" fill="none" transform="scale(2)"><path id="axis" class="no" d="M 200 210   c 0 -7.500 4.500 -75 -6.500 -74 20 0 20 30 12 37 l 5 0 c 5 -20 5 -47 -27 -47 l -50 -6 -15 -4.500 c -1.500 -4.500 3 -9 -6 -9 l 0 9 c -4.500 0 -22.500 13.500 -28.500 19.500 l 3 7.500 16.500 0 c 7.500 7.500 18 45 18 67.500 l 0 9 6 0 0 -9 1.500 -45 c 10.500 15 10.500 15 9 45 l 6 0 c 0 -7.500 4.500 -45 -1.500 -52.500 42 4.500 27 18 30.500 52.500 l 0 9 6 0 0 -9 6 -45 c 10.500 15 10.500 15 9 45 l 5.651 0"></path></g></svg></div><div class="text-holder">Giraffe?</div></div>
+    <div class="item-holder" data-model="iPath/tripptrapptop.jsvg" data-about="iPath/tripptrapptop.html"><div class="item w2 h4"><img src="iPath/img/brocoli_1.png"/></div><div class="text-holder">Tripp Trapp Table</div></div>
+    <div class="item-holder" data-model="iPath/characters.jsvg"><div class="item w2 h2">
+      <svg xmlns="http://www.w3.org/2000/svg" version="1.1" viewbox="200 60 200 200" height="100%" width="100%">
+<g stroke="red" stroke-width="1.5" fill="none" transform="scale(1.000)"><line x1="0" y1="100" x2="1800" y2="100" style="{stroke-width:0.2}"></line><line x1="0" y1="160" x2="1800" y2="160" style="{stroke-width:0.2}"></line><line x1="0" y1="200" x2="1800" y2="200" style="{stroke-width:0.2}"></line><line x1="0" y1="220" x2="1800" y2="220" style="{stroke-width:0.2}"></line><line x1="0" y1="260" x2="1800" y2="260" style="{stroke-width:0.2}"></line><path id="bult1" d="M 40.000 200 c 6 -4 23 0 28 -40 12.500 -100 -10 -41 -12 30 -1.400 49.700 19 23 22 -4 4.200 -37.800 -15 -2 5 0 20 2 30 -39.600 40 -6 -11 -38.500 -30 -20 -30 10 0 24 20 65 30 -30 -7 66.500 0 60 5 60 5 0 30 -77 40 -40 -7 -24.500 -30 -20 -30 10 0 9 12 39 22 27 1 -1.200 8 -8 9 -9 1 -1 23 -8.800 25 -58 5 -125 -10 -41 -12 70 2.400 -133.200 45 15 4 -30 4.100 4.500 4 0 12 30 1.600 6 0 0 5 -5 m 20 -15 c 10 -30 20 -90 15 -50 1 -8 -5 60 -5 70 0 -60 -15 -20 0 -20 15 0 30 -75 40 -20 -40 -75 -20 110 2 10 6.600 -30 -4 -7 0 0 m 20 10  c 10 -20 30 -55 32 -40 0.400 3 -8 -10 -3 3 10 26 30 77 -23 47 26.500 15 32 0 40 -11 8 -11 30 -53.900 40 -19 -7 -24.500 -30 -20 -30 10 0 9 12 39 22 27 1 -1.200 8 -8 9 -9 1 -1 23 -8.800 32 -58 22.500 -125 -10 -41 -12 70 0.400 -22.200 20 -120 22 -10 0.400 22 -12 0 -5 -5 7 -5 30 -80.500 40 -25 -40 -75 -20 110 2 10 6.600 -30 -4 -7 0 0 4 7 30 -64 40 -10 -40 -75 -20 110 2 10 6.600 -30 -4 -7 0 0 4 7 33 11 30 -30 -7.500 -100 -10 -35 -20 30 -6 39 0 35 20 20"/></g>
+	</svg>
+</div><div class="text-holder">Stretch write</div></div>
+    <div class="item-holder" data-model="iPath/wineMan.jsvg" data-about="iPath/wineMan.html"><div class="item w2 h3"><img src="iPath/img/buckny-1.png"/></div><div class="text-holder">Couch table "Buckny"</div></div>
+    <div class="item-holder" data-model="stretchbox.jsvg"><div class="item w2 h4"><svg xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="50 35 150 200" width="100%" height="100%"><g stroke="red" stroke-width="0.500" fill="none" transform="scale(0.800)"><path id="ribbons" d="M 86.000 126.000  l 6 0 m 6 0 l 6 0 m 6 0 l 6 0 m 6 0 l 6 0 m 6 0 l 6 0 m 6 0 l 6 0 m 6 0 l 6 0 m 6 0 l 6 0 m 6 0 l 6 0 m 6 0 l 1 0 m 1 0  l 0 6 m 0 6 l 0 6 m 0 6 l 0 6 m 0 6 l 0 5 m 0 5  l -6 0 m -6 0 l -6 0 m -6 0 l -6 0 m -6 0 l -6 0 m -6 0 l -6 0 m -6 0 l -6 0 m -6 0 l -6 0 m -6 0 l -6 0 m -6 0 l -6 0 m -6 0 l -1 0 m -1 0  l 0 -6 m 0 -6 l 0 -6 m 0 -6 l 0 -6 m 0 -6 l 0 -5 m 0 -5   l -6 0 m -6 0 l -6 0 m -6 0 l -6 0 m -6 0 l -5 0 m -5 0 l 0 -32.200 l 32.200 0 l 13.800 32.200  m -46.000 0c -25.000 0 -25.000 0 -25.000 9.200 l 0 27.600 c 0 9.200 0 9.200 25.000 9.200   l 0 -6 m 0 -6 l 0 -6 m 0 -6 l 0 -6 m 0 -6 l 0 -5 m 0 -5 m 0 46.000  l 0 32.200 l 32.200 0 l 13.800 -32.200  m -46.000 0 l 6 0 m 6 0 l 6 0 m 6 0 l 6 0 m 6 0 l 5 0 m 5 0 m 110.000 0 l 6 0 m 6 0 l 6 0 m 6 0 l 6 0 m 6 0 l 5 0 m 5 0 l 0 32.200 l -32.200 0 l -13.800 -32.200  m 46.000 0c 25.000 0 25.000 0 25.000 -9.200 l 0 -27.600 c 0 -9.200 0 -9.200 -25.000 -9.200  l 0 6 m 0 6 l 0 6 m 0 6 l 0 6 m 0 6 l 0 5 m 0 5 m 0 -46.000  l 0 -32.200 l -32.200 0 l -13.800 32.200  m 46.000 0 l -6 0 m -6 0 l -6 0 m -6 0 l -6 0 m -6 0 l -5 0 m -5 0 l 0 -46.000c 0 -25.000 0 -25.000 -22.000 -25.000 l -66.000 0 c -22.000 0 -22.000 0 -22.000 25.000  l 5.500 0 m 5.500 0 l 88.000 0  l 5.500 0 m 5.500 0 m -110.000 0l 0 46.000m 0 46.000l 0 46.000 l 6 0 m 6 0 l 6 0 m 6 0 l 6 0 m 6 0 l 6 0 m 6 0 l 6 0 m 6 0 l 6 0 m 6 0 l 6 0 m 6 0 l 6 0 m 6 0 l 6 0 m 6 0 l 1 0 m 1 0l 0 46.000 l -12.100 0  l -6 0 m -6 0 l -6 0 m -6 0 l -6 0 m -6 0 l -6 0 m -6 0 l -6 0 m -6 0 l -6 0 m -6 0 l -6 0 m -6 0 l -0.900 0 m -0.900 0 l -12.100 0c 0 25.000 0 25.000 22.000 25.000 l 66.000 0 c 22.000 0 22.000 0 22.000 -25.000  m -110.000 0 l 0 -46.000 m 110.000 0 l 0 -46.000"></path></g></svg></div><div class="text-holder"></div><div class="text-holder">Stretch box</div></div>
+    <div class="item-holder" data-model="fabmoments/kruidenrondgang.jsvg"><div class="item h4"><img src="./img/spicerack.jpg"/></div><div class="text-holder">Spice rack</div></div>
+    <div class="item-holder" data-about="iPath/stool.html"><div class="item w2 h4">Stretchsketch lets you view,adapt and download product plans or design files for things. Use these in lasercutter or cnc routers.<p>Click on the tiles to view the model and download the file.</div><div class="text-holder">About</div></div>
 
-<div id="header"><div class="headertext"><i>i</i>Scr<i>i</i>pt Des<i>i</i>gn</div>
-<div id="lsider"></div>
-<div id="supported">(iScriptDesign has been tested with Chrome, Firefox, Safari and Opera)</div></div>
-<div class="container">
-<div class="isd_menu designmenu">
-	<ul>
-		<li>
-			About
-			<ul>
-                          <li><a class="extern" href="movie/index.html">The Movie</a></li>
-
-			  <li><a id="about.html" href="#" class="show_graph">Intro</a></li>
-			  <li><a id="news.html" href="#" class="">News</a></li>
-			  <li><a id="credits.jsvg" href="#">Credits</a></li>
-			  <li><a id="contact.jsvg" href="#" class="show_graph">Contact</a></li>
-			</ul>
-		<li>
-			Tutorial
-			<ul>
-			    <li><a id="tutorial/points.html" href="" class="show_graph">Intro &amp; points</a></li>
-			    <li><a id="tutorial/paths.html" href="" class="show_graph">Groups &amp; paths</a></li>
-			    <li><a id="tutorial/parameters.html" href="">Parameters</a></li>
-			    <li><a id="tutorial/scripts.html" href="" class="show_graph">Scripts</a></li>
-			    <li><a id="tutorial/ipath.html" href="" class="show_graph">iPath</a></li>
-			  <li><a id="tutorial/splitbezier.html" href="" class="show_graph">Split Bezier</a></li>
-			</ul>
-		</li>
-		<li>
-			iFabrica
-			<ul>
-    			    <li><a id="iPath/henhouse.jsvg" href="">henhouse</a></li>
-    			    <li><a id="iPath/nachtKast2.html" class="show_graph" href="">Nachtkast</a></li>
-                        </ul>
-                </li>
-		<li>
-			Projects
-			<ul>
-	 	            <li><a id="iPath/stool.html" href="" class="show_graph">Stool</a></li>
-	 	            <li><a id="iPath/tripptrapptop.html" href="" class="show_graph">Tripptrapp Top</a></li>
- 		            <li><a id="fabmoments/kruidenrondgang.jsvg" href="#">Spice Caroussel</a></li>
- 	 	            <li><a id="iPath/wineMan.html" href="" class="show_graph">Couch Table</a></li>
- 		            <li><a id="stretchbox.jsvg" href="#">Stretch Box</a></li>
-		</li>
-
-			</ul>
-                </li>
-      		<li>
-		    Varia
-		    <ul>
-        	 	<li><a id="iPath/arcTest.jsvg" href="#">arcTest</a></li>
-        	 	<li><a id="iPath/to.jsvg" href="#">to</a></li>
-	 	        <li><a id="iPath/cow.jsvg" href="#">cow</a></li>
-		        <li><a id="fabmoments/spiceonballs.html" href="" class="show_graph">Spice On Balls</a></li>
-		        <li><a id="iPath/gear.jsvg" href="" class="show_graph">gear</a></li>
-		        <li><a id="iPath/pensandholes.jsvg" href="" class="show_graph">pen joints</a></li>
-		        <li><a id="iPath/polybezier.jsvg" href="" class="show_graph">poly bezier</a></li>
-		<li>iPath
-		  <ul>
-	 	    <li><a id="iPath/characters.jsvg" href="#">Back to school</a></li>
-	 	    <li><a id="iPath/loop.jsvg" href="#">Turtle Graphics</a></li>
-	 	    <li>visite kaart
-		      <ul><li><a id="iPath/visitekaart.jsvg" href="#">voorkant</a></li>
-			<li><a id="iPath/visitekaart2.jsvg" href="#">achterkant</a></li>
-			<li><a id="iPath/watermerk.jsvg" href="#">watermerk</a></li>
-                        </li></ul>
-		  </ul>
-		    </ul>
-                </li>
-		<li><a class="extern" href="http://www.surveymonkey.com/s/CM233P9" target="_new">Poll</a></li>
-	</ul>
-		<div class="dropspot" id="dropspot"><div class="file-upload"> <input id="file-input" type="file" class="afile"/> </div>
-<div id="other-upload">Drop Spot<div class="image_container isd_drop"></div></div></div>
-
+    <div class="item-holder" data-model="fabmoments/kruidenrondgang.jsvg"><div class="item h3"><img src="./img/news.png" width="110px" height="220px"/></div><div class="text-holder">News</div></div>
+    <div class="item-holder" data-model="iPath/stool.jsvg" data-about="iPath/stool.html"><div class="item w3 h5"><img src="iPath/img/littleandbigstool.png"/></div><div class="text-holder">Little &amp; Big stools</div></div>
+  </div>
 </div>
-<div id="designpanel">
-<svg>
-</svg>
-</div>
-<div class="clear"></div>
-</div>
-<div id="svgexport" class="text"></div>
+
+<script type="text/javascript" src="js/jquery-2.1.1.js"></script>
+<script type="text/javascript" src="js/masonry.js"></script>
+<script type="text/javascript" src="js/iPath.js"></script>
+<script type="text/javascript" src="js/stretchsketch.js"></script>
+<script type="text/javascript" src="js/FileSaver.js"></script>
+<script type="text/javascript" src="js/lazyload.js"></script>
+<script type="text/javascript" src="js/jquery-ui-1.11.2.custom.js"></script>
 </body>
 </html>
