@@ -30,7 +30,7 @@ function itemHolderClick(urls) {
     $('.playground').css('clear', 'both');
     $('.playground').html( '<div id="model" class="model">' 
 			   + '<div class="dashboard"></div><div id="svg-container" class="svg"><svg></svg></div>'
-			   + '<div class="goaway"></div><div id="about" class="about"></div></div>'
+			   + '<div class="goaway"></div><div id="about" class="about"><div id="edit" class="edit"></div></div>'
 			   +'</div>');
     $('.playground').css('border', '1px solid black');
     $('.playground').animate({
@@ -48,7 +48,25 @@ function itemHolderClick(urls) {
 }
 
 $( document ).ready( function() {
+    $.ajaxSetup({ cache: true });
+    $.getScript('//connect.facebook.net/en_UK/all.js', function(){
+	FB.init({
+	    appId: '252245824893327',
+	});     
+	$('#loginbutton,#feedbutton').removeAttr('disabled');
+	FB.getLoginStatus(function() {console.log('updated')});
+    });
    var cnt = $('.container');
+    var match
+        , pl     = /\+/g  // Regex for replacing addition symbol(+) with a space
+        , search = /([^&=]+)=?([^&]*)/g
+        , decode = function (s) { return decodeURIComponent(s.replace(pl, " ")); }
+        , query  = window.location.search.substring(1);
+
+    urlParams = {};
+    while (match = search.exec(query))
+       urlParams[decode(match[1])] = decode(match[2]);
+
    cnt.masonry({
        isFitWidth: true,
        columnWidth: 150,
@@ -59,6 +77,9 @@ $( document ).ready( function() {
     $('.item-holder').on("click", function() { 
 	itemHolderClick({model: $(this).data('model'), about: $(this).data('about')}); 
     });
+    if (urlParams['sketch']) {
+	itemHolderClick({model: urlParams['sketch']});
+    }
 });
 
 jQuery.fn.initDrop = function() {
@@ -186,10 +207,11 @@ var StretchSketch = (function() {
                     $("#editme", controlPanelMenu).click({stretchSketch: instance }, function (evt) {
 		        LazyLoad.js(['js/codemirror.js', 'js/mode/javascript.js'], function() {
 			    LazyLoad.css('css/codemirror.css', function() {
-				editor = CodeMirror(document.getElementById('editedit')
+				editor = CodeMirror(document.getElementById('about')
 				    , { value: evt.data.stretchSketch.fileText, mode: "javascript", lineNumbers: true, matchBrackets: true, theme: "default"});
 				setTimeout(function(){editor.refresh();}, 200);
-				$('#editedit').dialog('open');
+				$('#about').empty;$('#svg-container').hide();$('#about').show();
+//				$('#editedit').dialog('open');
 			    })
 			})
 		    });
