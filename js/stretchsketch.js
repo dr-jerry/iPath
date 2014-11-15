@@ -48,14 +48,6 @@ function itemHolderClick(urls) {
 }
 
 $( document ).ready( function() {
-    $.ajaxSetup({ cache: true });
-    $.getScript('//connect.facebook.net/en_UK/all.js', function(){
-	FB.init({
-	    appId: '252245824893327',
-	});     
-	$('#loginbutton,#feedbutton').removeAttr('disabled');
-	FB.getLoginStatus(function() {console.log('updated')});
-    });
    var cnt = $('.container');
     var match
         , pl     = /\+/g  // Regex for replacing addition symbol(+) with a space
@@ -80,6 +72,14 @@ $( document ).ready( function() {
     if (urlParams['sketch']) {
 	itemHolderClick({model: urlParams['sketch']});
     }
+    $.ajaxSetup({ cache: true });
+    $.getScript('//connect.facebook.net/en_UK/all.js', function(){
+	FB.init({
+	    appId: '252245824893327',
+	});     
+	$('#loginbutton,#feedbutton').removeAttr('disabled');
+	FB.getLoginStatus(function() {console.log('updated')});
+    });
 });
 
 jQuery.fn.initDrop = function() {
