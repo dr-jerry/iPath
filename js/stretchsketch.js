@@ -28,15 +28,13 @@ goAway = function() {
 function itemHolderClick(urls) {
     $("html, body").animate({ scrollTop: 0 }, "slow");
     $('.playground').css('clear', 'both');
-    $('.playground').html( '<div id="model" class="model">' 
-			   + '<div class="dashboard"></div><div id="svg-container" class="svg"><svg></svg></div>'
-			   + '<div class="goaway"></div><div id="about" class="about"><div id="edit" class="edit"></div></div>'
-			   +'</div>');
+    $('.playground').html( '<div class="dashboard"></div><div id="model" class="svg mainpanel"><svg></svg></div>'
+			   + '<div class="goaway"></div><div id="about" class="about mainpanel"></div><div id="edit" class="edit mainpanel"></div>');
     $('.playground').css('border', '1px solid black');
     $('.playground').animate({
 	height: '80vh'
 	, width: '98vw'
-    },{complete:$('div.goaway').position({my: 'right top', at: 'right top', of: $('#svg-container'), collision: 'none none' })}
+    },{complete:$('div.goaway').position({my: 'right top', at: 'right top', of: $('#model'), collision: 'none none' })}
 			    );
     $('div.goaway').css('left', parseInt($('div.goaway').css('left'))-30 + "px");
     $('div.goaway').css('top',parseInt($('div.goaway').css('top'))-20 + "px");
@@ -44,7 +42,6 @@ function itemHolderClick(urls) {
     if (urls) {
 	processUrls(urls,true);//'iPath/visitekaart.jsvg', true);
     }
-    $('.about').hide();
 }
 
 $( document ).ready( function() {
@@ -81,6 +78,17 @@ $( document ).ready( function() {
 	FB.getLoginStatus(function() {console.log('updated')});
     });
 });
+
+function focusPanel(id) {
+    var toggleDashboard = function(on, id) {
+	$('.real.slider').slider(on ? 'enable' : 'disable');
+	$('li.dashboard').removeClass('selected');
+	$('#' + id + '_menu').addClass('selected');
+    }
+    $('.mainpanel').hide();
+    $('#' + id).show();
+    toggleDashboard(/model/.test(id),id);
+}
 
 jQuery.fn.initDrop = function() {
     readFile = function rf(file) {
@@ -138,14 +146,6 @@ var StretchSketch = (function() {
 		    $('div.svg svg').replaceWith(instance.evalJSVG());
             }
         };
-	var toggleDashboard = function(on, element) {
-	    if (on == undefined) {
-		on = !$('.real.slider')[0].slider("option","disabled");
-	    }
-	    $('.real.slider').slider(on ? 'enable' : 'disable');
-	    $('li.dashboard').removeClass('selected');
-	    element.addClass('selected');
-	}
 
         var options = $.extend({
             model: '', jsvg: '', controlPanel: undefined, edit: false, showOnInit: true
@@ -187,31 +187,26 @@ var StretchSketch = (function() {
 	    $('.menu', options["controlPanel"]).remove();
             $('.inputline', options["controlPanel"]).remove();
 	    if (options["model"]) {
-		$('<li class="dashboard" id="model">Model</li>').appendTo($('ul', controlPanelMenu));
-		$("#model", controlPanelMenu).click(function() {
-		    $('#svg-container').show();
-		    toggleDashboard(true, $(this));
-		    $('#about').hide();
+		$('<li class="dashboard" id="model_menu">Model</li>').appendTo($('ul', controlPanelMenu));
+		$("#model_menu", controlPanelMenu).click(function() {
+		    focusPanel('model');
 		});
 	    }
 	    if (options["about"]) {
 		$('<li class="dashboard" id="about_menu">About</li>').appendTo($('ul', controlPanelMenu));
 		$("#about_menu", controlPanelMenu).click(function() {
-		    $('#svg-container').hide();
-		    toggleDashboard(false, $(this));
-		    $('#about').show();
+		    focusPanel('about');
 		});
 	    }
             if (options["edit"]) {
-                $('<li class="dashboard" id="editme">Edit</li>').appendTo($('ul', controlPanelMenu));
-                    $("#editme", controlPanelMenu).click({stretchSketch: instance }, function (evt) {
+                $('<li class="dashboard" id="edit_menu">Edit</li>').appendTo($('ul', controlPanelMenu));
+                    $("#edit_menu", controlPanelMenu).click({stretchSketch: instance }, function (evt) {
 		        LazyLoad.js(['js/codemirror.js', 'js/mode/javascript.js'], function() {
 			    LazyLoad.css('css/codemirror.css', function() {
-				editor = CodeMirror(document.getElementById('about')
+				editor = CodeMirror(document.getElementById('edit')
 				    , { value: evt.data.stretchSketch.fileText, mode: "javascript", lineNumbers: true, matchBrackets: true, theme: "default"});
 				setTimeout(function(){editor.refresh();}, 200);
-				$('#about').empty;$('#svg-container').hide();$('#about').show();
-//				$('#editedit').dialog('open');
+				focusPanel('edit');
 			    })
 			})
 		    });
@@ -230,6 +225,7 @@ var StretchSketch = (function() {
 	if (options["showOnInit"]) {
 	    options.defaultRenderer();
 	}
+	focusPanel('model');
        	return instance;
     };
 
@@ -515,7 +511,12 @@ timers = {
 
 function processUrls(urls, processJSVG) {
     $('#abouttext').remove();
+    var id = '';
+    if (urls.model) {
+	stretchSketch = StretchSketch.load({model: urls.model, controlPanel: $('.dashboard'), edit: true, about: urls.about});
+    } 
     if (urls.about) {
+	id = !id ? 'about' : id;
         $.ajax({url: urls.about
            , timeout: 2000
            , datatype: "html"
@@ -523,13 +524,9 @@ function processUrls(urls, processJSVG) {
            , success: function(html, status,xreq) {
                $('.about').append(html);
 	       if (!urls.model) {
-		   $('#svg-container').hide();
-		   $('#about').show();
+		   focusPanel('about');
 	       }
              }
         });
     }
-    if (urls.model) {
-	stretchSketch = StretchSketch.load({model: urls.model, controlPanel: $('.dashboard'), edit: true, about: urls.about});
-    } 
 }
