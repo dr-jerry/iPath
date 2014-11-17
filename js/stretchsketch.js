@@ -29,7 +29,8 @@ function itemHolderClick(urls) {
     $("html, body").animate({ scrollTop: 0 }, "slow");
     $('.playground').css('clear', 'both');
     $('.playground').html( '<div class="dashboard"></div><div id="model" class="svg mainpanel"><svg></svg></div>'
-			   + '<div class="goaway"></div><div id="about" class="about mainpanel"></div><div id="edit" class="edit mainpanel"></div>');
+			   + '<div id="goaway" class="goaway"><div id="reload" class="reload"/></div><div id="about" class="about mainpanel"></div>'
+			   + '<div id="edit" class="edit mainpanel"></div></div>');
     $('.playground').css('border', '1px solid black');
     $('.playground').animate({
 	height: '80vh'
@@ -88,6 +89,10 @@ function focusPanel(id) {
     $('.mainpanel').hide();
     $('#' + id).show();
     toggleDashboard(/model/.test(id),id);
+    $('.reload').hide();
+    if (/edit/.test(id)) {
+	$('.reload').show();
+    }
 }
 
 jQuery.fn.initDrop = function() {
@@ -207,6 +212,9 @@ var StretchSketch = (function() {
 				    , { value: evt.data.stretchSketch.fileText, mode: "javascript", lineNumbers: true, matchBrackets: true, theme: "default"});
 				setTimeout(function(){editor.refresh();}, 200);
 				focusPanel('edit');
+				$('div.reload').position({my: 'right top', at: 'right top', of: $('#edit'), collision: 'none none' });
+				$('div.reload').css('left', parseInt($('div.reload').css('left'))-40 + "px");
+				$('div.reload').css('top',parseInt($('div.reload').css('top'))-65 + "px");
 			    })
 			})
 		    });
