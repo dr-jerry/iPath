@@ -74,6 +74,7 @@ $( document ).ready( function() {
     $.getScript('//connect.facebook.net/en_UK/all.js', function(){
 	FB.init({
 	    appId: '252245824893327',
+	    xfbml: true
 	});     
 	$('#loginbutton,#feedbutton').removeAttr('disabled');
 	FB.getLoginStatus(function() {console.log('updated')});
