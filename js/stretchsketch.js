@@ -29,7 +29,7 @@ function itemHolderClick(urls) {
     $("html, body").animate({ scrollTop: 0 }, "slow");
     $('.playground').css('clear', 'both');
     $('.playground').html( '<div class="dashboard"></div><div id="model" class="svg mainpanel"><svg></svg></div>'
-			   + '<div id="goaway" class="goaway"><div id="reload" class="reload"/></div><div id="about" class="about mainpanel"></div>'
+			   + '<div id="goaway" class="goaway"></div><div id="reload" class="reload"/></div><div id="about" class="about mainpanel"></div>'
 			   + '<div id="edit" class="edit mainpanel"></div></div>');
     $('.playground').css('border', '1px solid black');
     $('.playground').animate({
@@ -74,6 +74,7 @@ $( document ).ready( function() {
     $.getScript('//connect.facebook.net/en_UK/all.js', function(){
 	FB.init({
 	    appId: '252245824893327',
+	    xfbml: true
 	});     
 	$('#loginbutton,#feedbutton').removeAttr('disabled');
 	FB.getLoginStatus(function() {console.log('updated')});
@@ -208,13 +209,18 @@ var StretchSketch = (function() {
                     $("#edit_menu", controlPanelMenu).click({stretchSketch: instance }, function (evt) {
 		        LazyLoad.js(['js/codemirror.js', 'js/mode/javascript.js'], function() {
 			    LazyLoad.css('css/codemirror.css', function() {
-				editor = CodeMirror(document.getElementById('edit')
-				    , { value: evt.data.stretchSketch.fileText, mode: "javascript", lineNumbers: true, matchBrackets: true, theme: "default"});
-				setTimeout(function(){editor.refresh();}, 200);
+				if (typeof editor !== 'undefined') {
+				    editor.setValue("");
+				    editor.clearHistory();
+				    editor.clearHistory("gutterId");
+				} 
+				 editor = CodeMirror(document.getElementById('edit')
+							, { value: evt.data.stretchSketch.fileText, mode: "javascript", lineNumbers: true, matchBrackets: true, theme: "default"});
+				setTimeout(function(){ editor.refresh(); }, 200);
 				focusPanel('edit');
 				$('div.reload').position({my: 'right top', at: 'right top', of: $('#edit'), collision: 'none none' });
-				$('div.reload').css('left', parseInt($('div.reload').css('left'))-40 + "px");
-				$('div.reload').css('top',parseInt($('div.reload').css('top'))-65 + "px");
+				$('div.reload').css('left', parseInt($('div.reload').css('left'))-20 + "px");
+				$('div.reload').css('top',parseInt($('div.reload').css('top'))-55 + "px");
 			    })
 			})
 		    });
