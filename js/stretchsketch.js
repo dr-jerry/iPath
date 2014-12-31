@@ -538,7 +538,7 @@ function processUrls(urls, processJSVG) {
            , success: function(html, status,xreq) {
                $('.about').append(html);
 	       if (!urls.model) {
-		   focusPanel('about');
+		   focusPanel(urls.focus || 'about');
 	       }
              }
         });
