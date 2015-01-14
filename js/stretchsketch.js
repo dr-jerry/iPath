@@ -165,14 +165,20 @@ var StretchSketch = (function() {
            , datatype: "text"
            , complete: function(xml) {
            }
-           , success: function(text) {
-              if (typeof text === 'object') {
- 	          instance = new StretchSketch();
-                  instance.document = text;
-                  return;
-	      }
-	      instance = new StretchSketch(text); 
-	   }
+           , success: [function(text) {
+               if (typeof text === 'object') {
+ 	           instance = new StretchSketch();
+                   instance.document = text;
+                   return;
+	       }
+	       instance = new StretchSketch(text); 
+	   } , function(xhr) {
+	       alert('alert for ajax');
+		   $.ajax({url: 'app/stat/' + encodeURIComponent(options["model"])
+		      , timeout: 1000
+		      , datatype: "text"
+		     })
+	   }]
            , error: function(http, msg, ex) {
         	   alert("error during processload url: '" + options["model"] + "'" , msg);
            }
