@@ -173,7 +173,6 @@ var StretchSketch = (function() {
 	       }
 	       instance = new StretchSketch(text); 
 	   } , function(xhr) {
-	       alert('alert for ajax');
 		   $.ajax({url: 'app/stat/' + encodeURIComponent(options["model"])
 		      , timeout: 1000
 		      , datatype: "text"
