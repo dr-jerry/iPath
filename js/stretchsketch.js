@@ -173,7 +173,7 @@ var StretchSketch = (function() {
 	       }
 	       instance = new StretchSketch(text); 
 	   } , function(xhr) {
-		   $.ajax({url: 'app/stat/' + encodeURIComponent(options["model"])
+		   $.ajax({url: 'app/stat/' + options["model"].replace(/\//g, '_')
 		      , timeout: 1000
 		      , datatype: "text"
 		     })
