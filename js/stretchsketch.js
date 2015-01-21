@@ -1,5 +1,5 @@
 /*
- * Copyright 2010 Jeroen Dijkmeijer.
+ * Copyright 2010 Jeroen Dijkmeijer.d
  *
  * Licensed under the GPL, Version 3.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -45,6 +45,18 @@ function itemHolderClick(urls) {
     }
 }
 
+function selectTiles(tag) {
+   $('.container > div').each(function(index, elem) {
+       var jqElem = $(elem);
+       if (jqElem.data('lable').indexOf(tag) != -1 || tag === 'all') {
+	   jqElem.show();
+       } else {
+	   jqElem.hide();
+       }
+   });
+   $('.container').masonry('layout');
+}
+
 $( document ).ready( function() {
    var cnt = $('.container');
     var match
@@ -70,6 +82,12 @@ $( document ).ready( function() {
     if (urlParams['sketch']) {
 	itemHolderClick({model: urlParams['sketch']});
     }
+    $('.tags .horizontal.menu').attr("id",function() {
+	    return $(this).data('tag') + '_menu';
+	}).on("click", function() {
+	        selectTiles($(this).data('tag'));
+	        toggleMenu($(this).data('tag'), $('.tags'));
+    });
     $.ajaxSetup({ cache: true });
     $.getScript('//connect.facebook.net/en_UK/all.js', function(){
 	FB.init({
@@ -81,15 +99,16 @@ $( document ).ready( function() {
     });
 });
 
-function focusPanel(id) {
-    var toggleDashboard = function(on, id) {
-	$('.real.slider').slider(on ? 'enable' : 'disable');
-	$('li.dashboard').removeClass('selected');
-	$('#' + id + '_menu').addClass('selected');
-    }
+var toggleMenu = function(id,context) {
+    $('li.horizontal.menu', context).removeClass('selected');
+    $('#' + id + '_menu',context).addClass('selected');
+}
+
+function focusPanel(id, context) {
     $('.mainpanel').hide();
     $('#' + id).show();
-    toggleDashboard(/model/.test(id),id);
+    $('.real.slider').slider(/model/.test(id) ? 'enable' : 'disable');
+    toggleMenu(id, $('.dashboard'));
     $('.reload').hide();
     if (/edit/.test(id)) {
 	$('.reload').show();
@@ -193,24 +212,24 @@ var StretchSketch = (function() {
 
         }
         instance.stripControls();
-	var controlPanelMenu = $('<div class="label-line"><ul class="dashboard menu"></ul></div>');
+	var controlPanelMenu = $('<div class="label-line"><ul class="menu"></ul></div>');
         if (options["controlPanel"]) {
 	    $('.menu', options["controlPanel"]).remove();
             $('.inputline', options["controlPanel"]).remove();
 	    if (options["model"]) {
-		$('<li class="dashboard" id="model_menu">Model</li>').appendTo($('ul', controlPanelMenu));
+		$('<li class="horizontal menu" id="model_menu">Model</li>').appendTo($('ul', controlPanelMenu));
 		$("#model_menu", controlPanelMenu).click(function() {
 		    focusPanel('model');
 		});
 	    }
 	    if (options["about"]) {
-		$('<li class="dashboard" id="about_menu">About</li>').appendTo($('ul', controlPanelMenu));
+		$('<li class="horizontal menu" id="about_menu">About</li>').appendTo($('ul', controlPanelMenu));
 		$("#about_menu", controlPanelMenu).click(function() {
 		    focusPanel('about');
 		});
 	    }
             if (options["edit"]) {
-                $('<li class="dashboard" id="edit_menu">Edit</li>').appendTo($('ul', controlPanelMenu));
+                $('<li class="horizontal menu" id="edit_menu">Edit</li>').appendTo($('ul', controlPanelMenu));
                     $("#edit_menu", controlPanelMenu).click({stretchSketch: instance }, function (evt) {
 		        LazyLoad.js(['js/codemirror.js', 'js/mode/javascript.js'], function() {
 			    LazyLoad.css('css/codemirror.css', function() {
