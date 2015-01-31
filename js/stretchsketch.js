@@ -77,7 +77,7 @@ $( document ).ready( function() {
    });
     $('#dropspot').initDrop();
     $('.item-holder').on("click", function() { 
-	itemHolderClick({model: $(this).data('model'), about: $(this).data('about')}); 
+	itemHolderClick({animation: $(this).data('animation'), model: $(this).data('model'), about: $(this).data('about')}); 
     });
     if (urlParams['sketch']) {
 	itemHolderClick({model: urlParams['sketch']});
@@ -550,21 +550,27 @@ timers = {
 function processUrls(urls, processJSVG) {
     $('#abouttext').remove();
     var id = '';
-    if (urls.model) {
-	stretchSketch = StretchSketch.load({model: urls.model, controlPanel: $('.dashboard'), edit: true, about: urls.about});
-    } 
+    if (urls.animation) {
+	console.log("reading a file");
+	$.getScript(urls.animation).fail(function() { console.log('loading of file ' + urls.animation + ' failed')})
+	    .done(function() {console.log("success")});
+    } else {
+	if (urls.model) {
+	   StretchSketch = StretchSketch.load({model: urls.model, controlPanel: $('.dashboard'), edit: true, about: urls.about});
+	}
+    }
     if (urls.about) {
 	id = !id ? 'about' : id;
         $.ajax({url: urls.about
-           , timeout: 2000
-           , datatype: "html"
-           , complete: function(html) {}
-           , success: function(html, status,xreq) {
-               $('.about').append(html);
-	       if (!urls.model) {
-		   focusPanel(urls.focus || 'about');
-	       }
-             }
-        });
+		, timeout: 2000
+		, datatype: "html"
+		, complete: function(html) {}
+		, success: function(html, status,xreq) {
+		    $('.about').append(html);
+		    if (!urls.model) {
+			focusPanel(urls.focus || 'about');
+		    }
+		}
+               });
     }
 }
