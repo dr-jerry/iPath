@@ -1549,6 +1549,17 @@ function crossProduct (v1, v2) {
        return result;
    }
 
+
+function extendPoint(v1) {
+    var result = {};
+    if (v1.x == undefined && v1.y == undefined && v1.a !== undefined && v1.r !== undefined) {
+	$.extend(result, {x : Math.cos(v1.a) * v1.r, y : Math.sin(v1.a) * v1.r}, v1);
+    } else if (v1.x !== undefined && v1.y !== undefined && v1.a == undefined && v1.r == undefined) {
+	$.extend(result, {a : Math.atan2(v1.y, v1.x), r: Math.sqrt((v1.x * v1.x) + (v1.y * v1.y))}, v1);
+    }
+    return result;
+}
+
 //              lc
 //  ______________
 //           oo   \ intersection2Tangent(length)
@@ -1557,31 +1568,31 @@ function crossProduct (v1, v2) {
 //                  o\
 //           c      o
 // returns an object consisting of corrections to replace the 'join point' or 'intersection' with an arc
-// arguments are 2 vector objects and the circleRadius.
+// arguments are 2 vector objects and the filletRadius.
 // result is 2 adjusted vectors and the arc object {v1: {x:.. , y:.. }, v2: {x:.., y:..}, arc: {cx:.., cy:.., r:.., x:.., y:..}}
 // cx and cy is the centerpoint of the arc.
-function doCorner (v1,v2,circleRadius) {
+function doCorner (v1,v2,filletRadius) {
       var middleAngle = bisectVectors({x:-v1.x, y:-v1.y}, {x:v2.x, y:v2.y});
-      var a1 = Math.atan2(v1.y, v1.x);
-      var a2 = Math.atan2(v2.y, v2.x);
-      var lengthV1 = Math.sqrt((v1.x * v1.x) + (v1.y * v1.y));
-      var lengthV2 = Math.sqrt((v2.x * v2.x) + (v2.y * v2.y));
-      var ma = Math.abs(a1 - a2+Math.PI)/2;
-      var i2c = Math.abs(circleRadius / Math.sin(ma));
-      var i2t = Math.abs(circleRadius / Math.tan(ma));
+      var vv1 = extendPoint(v1); //Math.atan2(v1.y, v1.x);
+      var vv2 = extendPoint(v2); //Math.atan2(v2.y, v2.x);
+      var lengthV1 = Math.sqrt((vv1.x * vv1.x) + (vv1.y * vv1.y));
+      var lengthV2 = Math.sqrt((vv2.x * vv2.x) + (vv2.y * vv2.y));
+      var ma = Math.abs(vv1.a - vv2.a+Math.PI)/2;
+      var i2c = Math.abs(filletRadius / Math.sin(ma));
+      var i2t = Math.abs(filletRadius / Math.tan(ma));
       var result = {
-         v1 : { x : Math.cos(a1)*(lengthV1 - i2t), y : Math.sin(a1)*(lengthV1 - i2t) }
-       , v2 : { x : Math.cos(a2)*(lengthV2 - i2t), y : Math.sin(a2)*(lengthV2 - i2t) }
+         v1 : { x : Math.cos(vv1.a)*(lengthV1 - i2t), y : Math.sin(vv1.a)*(lengthV1 - i2t) }
+       , v2 : { x : Math.cos(vv2.a)*(lengthV2 - i2t), y : Math.sin(vv2.a)*(lengthV2 - i2t) }
        , arc : {
-	   dxfClockWise : crossProduct(v1,v2) > 0
-           , r  : circleRadius
-           , reverse : v1.reverse != undefined ? v1.reverse : ((v1.x * v2.y) - (v1.y * v2.x)) > 0
-           , x  : i2t * (Math.cos(a1) + Math.cos(a2))
-	   , y  :  i2t * (Math.sin(a1) + Math.sin(a2))
-           , a1 : a1
-           , a2 : a2
-	   , cx : Math.cos(middleAngle) * i2c + Math.cos(a1)*(i2t)
-           , cy : Math.sin(a1)*(i2t) + Math.sin(middleAngle) * i2c
+	   dxfClockWise : crossProduct(vv1,vv2) > 0
+           , r  : filletRadius
+           , reverse : vv1.reverse != undefined ? vv1.reverse : ((vv1.x * vv2.y) - (vv1.y * vv2.x)) > 0
+           , x  : i2t * (Math.cos(vv1.a) + Math.cos(vv2.a))
+	   , y  :  i2t * (Math.sin(vv1.a) + Math.sin(vv2.a))
+           , a1 : vv1.a
+           , a2 : vv2.a
+	   , cx : Math.cos(middleAngle) * i2c + Math.cos(vv1.a)*(i2t)
+           , cy : Math.sin(vv1.a)*(i2t) + Math.sin(middleAngle) * i2c
        }
      };
      return result;
@@ -1590,39 +1601,37 @@ function doCorner (v1,v2,circleRadius) {
 // Makes a corner large enough for given bitRadius
 function clearCorner (v1,v2,bitRadius,log) {
       var middleAngle = bisectVectors({x:-v1.x, y:-v1.y}, {x:v2.x, y:v2.y});
-      var a1 = Math.atan2(v1.y, v1.x);
-      var a2 = Math.atan2(v2.y, v2.x);
-      var lengthV1 = Math.sqrt((v1.x * v1.x) + (v1.y * v1.y));
-      var lengthV2 = Math.sqrt((v2.x * v2.x) + (v2.y * v2.y));
-      var ma = Math.abs(a1 - a2+Math.PI)/2;
+      var vv1 = extendPoint(v1); //Math.atan2(v1.y, v1.x);
+      var vv2 = extendPoint(v2); //Math.atan2(v2.y, v2.x);
+      var ma = Math.abs(vv1.a - vv2.a+Math.PI)/2;
       var secant = Math.abs(2 * bitRadius * Math.cos(ma));
-      var cx = secant * Math.cos(a1) + Math.cos(middleAngle) * bitRadius;
-      var cy = secant * Math.sin(a1) + Math.sin(middleAngle) * bitRadius;
+      var cx = secant * Math.cos(vv1.a) + Math.cos(middleAngle) * bitRadius;
+      var cy = secant * Math.sin(vv1.a) + Math.sin(middleAngle) * bitRadius;
     var result = {
-	v1 : { x : Math.cos(a1)*(lengthV1 - secant), y : Math.sin(a1)*(lengthV1 - secant) }
-	, v2 : { x : Math.cos(a2)*(lengthV2 - secant), y : Math.sin(a2)*(lengthV2 - secant) }
+	v1 : { x : Math.cos(vv1.a)*(vv1.r - secant), y : Math.sin(vv1.a)*(vv1.r - secant) }
+	, v2 : { x : Math.cos(vv2.a)*(vv2.r - secant), y : Math.sin(vv2.a)*(vv2.r - secant) }
 	, arc : {
-	    dxfClockWise : crossProduct(v1,v2) > 0
+	    dxfClockWise : crossProduct(vv1,vv2) > 0
             , r  : bitRadius
-            , reverse : v1.reverse != undefined ? v1.reverse : ((v1.x * v2.y) - (v1.y * v2.x)) > 0
-            , x  : secant * (Math.cos(a1) + Math.cos(a2))
-	    , y  : secant * (Math.sin(a1) + Math.sin(a2))
-	    , cx : secant * Math.cos(a1) + Math.cos(middleAngle) * bitRadius
-            , cy : secant * Math.sin(a1) + Math.sin(middleAngle) * bitRadius
+            , reverse : vv1.reverse != undefined ? vv1.reverse : ((vv1.x * vv2.y) - (vv1.y * vv2.x)) > 0
+            , x  : secant * (Math.cos(vv1.a) + Math.cos(vv2.a))
+	    , y  : secant * (Math.sin(vv1.a) + Math.sin(vv2.a))
+	    , cx : secant * Math.cos(vv1.a) + Math.cos(middleAngle) * bitRadius
+            , cy : secant * Math.sin(vv1.a) + Math.sin(middleAngle) * bitRadius
 	}
     };
-    result['arc']['large_arc'] = false;//Math.abs(a1-a2).between(0.5 * Math.PI,1.5 * Math.PI);
+    result['arc']['large_arc'] = false;//Math.abs(vv1.a-vv2.a).between(0.5 * Math.PI,1.5 * Math.PI);
      return result;
    };
 
  
-    function arcPath(lines, r) {
+    function arcPath(lines, fr) {
        result = [{v2:lines[0]}];
        for (var x=1; x<lines.length; x++) {
            if (lines[x].br) {
 	       result[x] = clearCorner(result[x-1].v2, lines[x], lines[x].br);
-	   } else if (lines[x].r || r != undefined && lines[x].r != 0) {
-               result[x] = doCorner(result[x-1].v2, lines[x], lines[x].r || r);
+	   } else if (lines[x].fr || fr != undefined && lines[x].fr != 0) {
+               result[x] = doCorner(result[x-1].v2, lines[x], lines[x].fr || fr);
 	   } else {
 	       result[x] = {v1: result[x-1].v2, v2:lines[x]};
 //	       result[x].v2 = lines[x];

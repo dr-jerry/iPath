@@ -19,6 +19,7 @@
 
 goAway = function() {
     $('.playground').empty();$('.playground').height('0vh').width('98vw').css('border','none');
+    timers.reset();
 }
 /**
    Does all the preparation for creating the playground.
@@ -40,6 +41,7 @@ function itemHolderClick(urls) {
     $('div.goaway').css('left', parseInt($('div.goaway').css('left'))-30 + "px");
     $('div.goaway').css('top',parseInt($('div.goaway').css('top'))-20 + "px");
     $('div.goaway').on('click',goAway);
+    timers.reset();
     if (urls) {
 	processUrls(urls,true);//'iPath/visitekaart.jsvg', true);
     }
@@ -537,14 +539,23 @@ timers = {
 	if (!animationElement.endTime) { 
 	    animationElement.endTime = endTime;
 	}
-	timers.startTime = new Date().valueOf();
+       timers.startTime = new Date().valueOf();
         animationElement.stretchSketch.initRenderer();
 	timers.animate(animationElement, restart || 80);
     }
    , stop: function() {
    	 clearTimeout(this.timerID);
 	 this.timerID = 0;
-   } 
+   }, reset: function() {
+       this.stop();
+       this.runCount = 0;
+       this.startTime = 0;
+       this.timers = [];
+       this.slideIndex = 0 
+       this.callList= [];
+       this.animationList= [];
+       this.startOver= true;
+   }
 };
 
 function processUrls(urls, processJSVG) {

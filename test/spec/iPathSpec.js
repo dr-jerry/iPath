@@ -505,14 +505,14 @@ describe("iPath", function() {
 	expect(JSON.stringify(clearCorner({x:-40,y:0}, {x:10,y:40}, 2), signy)).toEqual('{"v1":{"x":-36.847,"y":0},"v2":{"x":9.235,"y":36.941},"arc":{"dxfClockWise":false,"r":2,"reverse":false,"x":-2.388,"y":3.059,"cx":-1.576,"cy":1.231,"large_arc":false}}');
     });
     it("tests arcPath with different radii and rotation in svg and dxf", function() {
-	var crn = arcPath([{x:80,y:0},{x:0,y:-80,r:20},{x:-160,y:-60,r:2*20},{x:0,y:140,r:20/2},{x:80,y:0,r:20*0.1}]).rotate(Math.PI/4);
+	var crn = arcPath([{x:80,y:0},{x:0,y:-80,fr:20},{x:-160,y:-60,fr:2*20},{x:0,y:140,fr:20/2},{x:80,y:0,fr:20*0.1}]).rotate(Math.PI/4);
 	expect('l.42.426.42.426.a.20.20.0.0.0.28.284.0..l.22.825.-22.825.a.40.40.0.0.0.8.13.-44.836..l.-53.269.-117.192.a.10.10.0.0.0.-16.175.-2.933..l.-87.377.87.377.a.2.2.0.0.0.0.2.828..l.55.154.55.154').toEqual(jasmineFix(crn.dPath(3)));
 	var dxfBuilder = new DxfBuilder(new Blobber(), 3);
 	crn.dxf(dxfBuilder,  {layer: {name: 'ellen', layer_color: 1}});	
 	expect(jasmineFix(jasmineFix(dxfBuilder.blobBuilder.getText().replace(/-/g,'_')))).toEqual('0\\nPOLYLINE\\n..6\\nSOLID\\n.62\\n256\\n..8\\nellen\\n.66\\n1\\n.10\\n0.0\\n.20\\n0.0\\n.30\\n0.0\\n.70\\n0\\n..0\\nVERTEX\\n..8\\nellen\\n.10\\n0\\n.20\\n0\\n.30\\n0\\n..0\\nVERTEX\\n..8\\nellen\\n.10\\n42.426\\n.20\\n42.426\\n.30\\n0\\n..0\\n*SEQRET*\\n..0\\nPOLYLINE\\n..6\\nSOLID\\n.62\\n256\\n..8\\nellen\\n.66\\n1\\n.10\\n0.0\\n.20\\n0.0\\n.30\\n0.0\\n.70\\n0\\n..0\\nVERTEX\\n..8\\nellen\\n.10\\n70.711\\n.20\\n42.426\\n.30\\n0\\n..0\\nVERTEX\\n..8\\nellen\\n.10\\n93.536\\n.20\\n19.601\\n.30\\n0\\n..0\\n*SEQRET*\\n..0\\nPOLYLINE\\n..6\\nSOLID\\n.62\\n256\\n..8\\nellen\\n.66\\n1\\n.10\\n0.0\\n.20\\n0.0\\n.30\\n0.0\\n.70\\n0\\n..0\\nVERTEX\\n..8\\nellen\\n.10\\n101.666\\n.20\\n_25.235\\n.30\\n0\\n..0\\nVERTEX\\n..8\\nellen\\n.10\\n48.398\\n.20\\n_142.427\\n.30\\n0\\n..0\\n*SEQRET*\\n..0\\nPOLYLINE\\n..6\\nSOLID\\n.62\\n256\\n..8\\nellen\\n.66\\n1\\n.10\\n0.0\\n.20\\n0.0\\n.30\\n0.0\\n.70\\n0\\n..0\\nVERTEX\\n..8\\nellen\\n.10\\n32.223\\n.20\\n_145.36\\n.30\\n0\\n..0\\nVERTEX\\n..8\\nellen\\n.10\\n_55.154\\n.20\\n_57.983\\n.30\\n0\\n..0\\n*SEQRET*\\n..0\\nPOLYLINE\\n..6\\nSOLID\\n.62\\n256\\n..8\\nellen\\n.66\\n1\\n.10\\n0.0\\n.20\\n0.0\\n.30\\n0.0\\n.70\\n0\\n..0\\nVERTEX\\n..8\\nellen\\n.10\\n_55.154\\n.20\\n_55.154\\n.30\\n0\\n..0\\nVERTEX\\n..8\\nellen\\n.10\\n0\\n.20\\n0\\n.30\\n0\\n..0\\n*SEQRET*\\n..0\\nARC\\n..8\\nellen\\n.10\\n56.569\\n.20\\n28.284\\n.30\\n0.0\\n.40\\n20\\n.50\\n45\\n.51\\n135\\n..0\\nARC\\n..8\\nellen\\n.10\\n65.252\\n.20\\n_8.683\\n.30\\n0.0\\n.40\\n40\\n.50\\n335.556\\n.51\\n45\\n..0\\nARC\\n..8\\nellen\\n.10\\n39.294\\n.20\\n_138.289\\n.30\\n0.0\\n.40\\n10\\n.50\\n225\\n.51\\n335.556\\n..0\\nARC\\n..8\\nellen\\n.10\\n_53.74\\n.20\\n_56.569\\n.30\\n0.0\\n.40\\n2\\n.50\\n135\\n.51\\n225');
 	});
     it("tests arcPath with specific r = 0, and global r > 0", function() {
-	var crn = arcPath([{x:80,y:0},{x:0,y:-80},{x:-160,y:-60,r:0}], 10);
+	var crn = arcPath([{x:80,y:0},{x:0,y:-80},{x:-160,y:-60,fr:0}], 10);
 	expect(jasmineFix(crn.dPath(3))).toEqual('l.70.0.a.10.10.0.0.0.10.-10..l.0.-70.-160.-60');
   });
   it ("tests an arcPath with a bitRadius", function() {
