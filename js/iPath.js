@@ -1681,41 +1681,42 @@ function clearCorner (v1,v2,br) {
     return result;
 };
 
-
 /*
  if br = negative, the t-bone fillet is a 3 line extension instead of an arc. (The bit radius remains the same.
 */
 
-function arcPath(lines, fr, poly) {
-       result = [{v2:lines[0]}];
-       for (var x=1; x<lines.length; x++) {
-           if (lines[x].br) {
-	       result[x] = clearCorner(result[x-1].v2, lines[x], lines[x].br);
-	   } else if (lines[x].fr || fr != undefined && lines[x].fr != 0) {
-               result[x] = doCorner(result[x-1].v2, lines[x], lines[x].fr || fr);
-	   } else {
-	       result[x] = {v1: result[x-1].v2, v2:lines[x]};
-//	       result[x].v2 = lines[x];
-	   }
-       }
-       var iResult = new iPath();
-       for (var x=1; x<result.length; x++) {
-           iResult.line(result[x].v1);
-	   if (result[x].poly) {
-	       iResult
-		   .line(result[x].poly.l1.x,result[x].poly.l1.y)
-		   .line(result[x].poly.l2.x,result[x].poly.l2.y)
-		   .line(result[x].poly.l3.x,result[x].poly.l3.y);
-	   } else if (result[x].arc) {
-	       iResult
-		   .arc(result[x].arc);
- 
+function arcPath(lines, fr, heading) {
+    result = [{v2:lines[0]}];
+    if (heading == undefined) {
+	heading = 0;
+    }
+    for (var x=1; x<lines.length; x++) {
+        if (lines[x].br) {
+	    result[x] = clearCorner(result[x-1].v2, lines[x], lines[x].br);
+	} else if (lines[x].fr || fr != undefined && lines[x].fr != 0) {
+            result[x] = doCorner(result[x-1].v2, lines[x], lines[x].fr || fr);
+	} else {
+	    result[x] = {v1: result[x-1].v2, v2:lines[x]};
+	}
+    }
+    var iResult = new iPath();
+    for (var x=1; x<result.length; x++) {
+        iResult.line(result[x].v1);
+	if (result[x].poly) {
+	    iResult
+		.line(result[x].poly.l1.x,result[x].poly.l1.y)
+		.line(result[x].poly.l2.x,result[x].poly.l2.y)
+		.line(result[x].poly.l3.x,result[x].poly.l3.y);
+	} else if (result[x].arc) {
+	    iResult
+		.arc(result[x].arc);
+	    
 
-	   }
-       }
-       iResult.line(result[result.length-1].v2);
-       return iResult;
-   }
+	}
+    }
+    iResult.line(result[result.length-1].v2);
+    return iResult;
+}
 
 function duoArrow(length, angle, startPt) {
     var l = [{x:0,y:4},{x:-3,y:-4},{x:3,y:-4},{x:0,y:4},{x:length-6,y:0},{x:0,y:4},{x:3,y:-4},{x:-3,y:-4},{x:0,y:4}];
