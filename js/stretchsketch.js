@@ -200,7 +200,7 @@ var StretchSketch = (function() {
 		     })
 	   }]
            , error: function(http, msg, ex) {
-        	   alert("error during processload url: '" + options["model"] + "'" , msg);
+        	   alert("error during processload url: '" + options["model"] + "'" + http , msg);
            }
         });
         } else {
@@ -567,7 +567,7 @@ function processUrls(urls, processJSVG) {
 	    .done(function() {console.log("success")});
     } else {
 	if (urls.model) {
-	   StretchSketch = StretchSketch.load({model: urls.model, controlPanel: $('.dashboard'), edit: true, about: urls.about});
+	   stretchSketch = StretchSketch.load({model: urls.model, controlPanel: $('.dashboard'), edit: true, about: urls.about});
 	}
     }
     if (urls.about) {
