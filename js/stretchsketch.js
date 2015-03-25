@@ -327,6 +327,7 @@ var StretchSketch = (function() {
 		control.element = mySlider;
 		mySlider[0].data = control.defaultvalue;
 	    	mySlider.bind("slide", {control: control }, function(event, ui) {
+		    console.log("bind bind mov.y " + mov.y);
 		    event.stretchSketchValue = ui.value;
 		    this.data = ui.value;
 		    $('.slider-control-value',  $('#' + event.data.control["id"]).parent()).html(ui.value);
@@ -390,6 +391,8 @@ var StretchSketch = (function() {
     	        if ("textfield.password".indexOf(attributes["type"]) == -1) {
 		    var a = variableName + '=' + attributes["defaultvalue"];
     		    eval(variableName + '=' + attributes["defaultvalue"]);
+    		    console.log("a is " +a + " mov.y is " + mov.y);
+
     	        } else {
     		    eval(variableName + '="' + attributes["defaultvalue"] + '"');
     	        }
