@@ -618,14 +618,31 @@ Bezier2Poly.prototype.iPath = function(array,init) {
     });
     return result;
 }
+Bezier2Poly.prototype.intersect = function(l1,l2) {
+    var x1 = l1[0].x, x2=l1[1].x, x3=l2[0].x, x4=l2[0].x;
+    var y1 = l1[0].y, y2=l1[1].y, y3=l2[0].y, y4=l2[0].y;
+    var nominator = (x1-x2)(y3-y4)-(y1-y2)(x3-x4);
+    if (nominator == 0) {
+	return false;
+    }
+    return {x: (x1*y2-y1*x2)(x3-x4)-(x1-x2)*(x3*y4-y3*x4)/nominator,
+	    y: (x1*y2-y1*x2)(y3-y4)-(y1-y2)*(x3*y4-y3*x4)/nominator};
+}
 
-Bezier2Poly.prototype.convert = function(array,init) {
+
+Bezier2Poly.prototype.convert = function(array, func, init) {
+    if (!func) {
+	func = function(result, array){
+	    result.push(array[2]);
+	}
+    }
     if (init) {
 	this.vertices = [];
 	this.recurs = 0;
     }
     if (!init && (Math.abs(this.calculateAngleBetweenVectors(array[0], array[2], true)) < this.threshold 
 		  && Math.abs(this.calculateAngleBetweenVectors({x:array[2].x-array[1].x, y:array[2].y-array[1].y}, array[2],true)) < this.threshold)) {
+//	func(this.vertices, array);
 	this.vertices.push(array[2]);
     } else {
 	var split = this.splitBezier(array);
@@ -1058,7 +1075,7 @@ DxfBuilder.prototype.getBlob = function(secret, uom) {
 
 
 iPath.prototype.dxf = function(dxfBuilder, options) {
-    options = $.extend(true, {layer: {name: 'default', layer_color: "7" }, bezier_tolerance: 0.12}, options || {});
+    options = $.extend(true, {layer: {name: 'default', layer_color: "7" }, bezier_tolerance: 0.8}, options || {});
     dxfBuilder.incorporateOptions(options);
     dxfBuilder.virgin = true;
     this.traverse(dxfBuilder);
