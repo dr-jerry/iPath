@@ -618,37 +618,56 @@ Bezier2Poly.prototype.iPath = function(array,init) {
     });
     return result;
 }
-Bezier2Poly.prototype.intersect = function(l1,l2) {
-    var x1 = l1[0].x, x2=l1[1].x, x3=l2[0].x, x4=l2[0].x;
-    var y1 = l1[0].y, y2=l1[1].y, y3=l2[0].y, y4=l2[0].y;
-    var nominator = (x1-x2)(y3-y4)-(y1-y2)(x3-x4);
-    if (nominator == 0) {
+Bezier2Poly.intersect = function(l1,l2) {
+    var x1 = l1[0].x, x2=l1[1].x+l1[0].x, x3=l2[0].x, x4=l2[1].x+l2[0].x;
+    var y1 = l1[0].y, y2=l1[1].y+l1[0].y, y3=l2[0].y, y4=l2[1].y+l2[0].y;
+    console.log("intersecting " + JSON.stringify([l1,l2]));
+    
+    var nominator = (x1-x2)*(y3-y4)-(y1-y2)*(x3-x4);
+    if (nominator === 0) {
+	console.log("returning false from intersecting " + JSON.stringify({'l1': l1,'l2': l2}));
 	return false;
     }
-    return {x: (x1*y2-y1*x2)(x3-x4)-(x1-x2)*(x3*y4-y3*x4)/nominator,
-	    y: (x1*y2-y1*x2)(y3-y4)-(y1-y2)*(x3*y4-y3*x4)/nominator};
-}
+    var result = {x: (x1*y2-y1*x2)*(x3-x4)-(x1-x2)*(x3*y4-y3*x4)/nominator,
+		  y: (x1*y2-y1*x2)*(y3-y4)-(y1-y2)*(x3*y4-y3*x4)/nominator};
+    console.log("returning from intersecting " + JSON.stringify(result));
+    return result;
+};
 
-
-Bezier2Poly.prototype.convert = function(array, func, init) {
-    if (!func) {
-	func = function(result, array){
-	    result.push(array[2]);
+Bezier2Poly.prototype.filletConvert = function(array, init) {
+    console.log("filletConvert with " + JSON.stringify(array));
+    return this.convert(array, init, function(result,a_rray) {
+	console.log("returning intersection of a_rray " + a_rray);
+	var crosspoint = Bezier2Poly.intersect([{x:0,y:0},a_rray[0]],[a_rray[2],{x:a_rray[2].x-a_rray[1].x, y:a_rray[2].y-a_rray[1].y}]);
+	if (crosspoint) {
+	    result.push(crosspoint);
+    	    result.push({x:a_rray[2].x-crosspoint.x, y:a_rray[2].y-crosspoint.y});
 	}
-    }
+    });
+};
+
+Bezier2Poly.prototype.convert = function(array, init, func) {
+    func = typeof func !== 'undefined' ? func : function(result, a_rray) { result.push(a_rray[2]); };
     if (init) {
 	this.vertices = [];
 	this.recurs = 0;
     }
+    console.log("passed array " + JSON.stringify(array))
+    if (!this.threshold) {
+	console.log("threshold is null");
+	return;
+    }
     if (!init && (Math.abs(this.calculateAngleBetweenVectors(array[0], array[2], true)) < this.threshold 
 		  && Math.abs(this.calculateAngleBetweenVectors({x:array[2].x-array[1].x, y:array[2].y-array[1].y}, array[2],true)) < this.threshold)) {
-//	func(this.vertices, array);
-	this.vertices.push(array[2]);
+	// this.vertices.push(array[2]);
+	func(this.vertices, array);
     } else {
 	var split = this.splitBezier(array);
-	this.convert(split.b1);
-	this.convert(split.b2);
+	console.log(" split.. " + JSON.stringify(split));
+	this.convert(split.b1,false,func);
+	this.convert(split.b2,false,func);
     }
+    console.log("from convert returning " + JSON.stringify(this.vertices));
     return this.vertices;
 }
 Bezier2Poly.prototype.interpolate = function (p0, p1, percent) {
@@ -1075,7 +1094,7 @@ DxfBuilder.prototype.getBlob = function(secret, uom) {
 
 
 iPath.prototype.dxf = function(dxfBuilder, options) {
-    options = $.extend(true, {layer: {name: 'default', layer_color: "7" }, bezier_tolerance: 0.8}, options || {});
+    options = $.extend(true, {layer: {name: 'default', layer_color: "7" }, bezier_tolerance: 0.12}, options || {});
     dxfBuilder.incorporateOptions(options);
     dxfBuilder.virgin = true;
     this.traverse(dxfBuilder);
