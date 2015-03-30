@@ -621,27 +621,22 @@ Bezier2Poly.prototype.iPath = function(array,init) {
 Bezier2Poly.intersect = function(l1,l2) {
     var x1 = l1[0].x, x2=l1[1].x+l1[0].x, x3=l2[0].x, x4=l2[1].x+l2[0].x;
     var y1 = l1[0].y, y2=l1[1].y+l1[0].y, y3=l2[0].y, y4=l2[1].y+l2[0].y;
-    console.log("intersecting " + JSON.stringify([l1,l2]));
-    
     var nominator = (x1-x2)*(y3-y4)-(y1-y2)*(x3-x4);
     if (nominator === 0) {
-	console.log("returning false from intersecting " + JSON.stringify({'l1': l1,'l2': l2}));
 	return false;
     }
     var result = {x: (x1*y2-y1*x2)*(x3-x4)-(x1-x2)*(x3*y4-y3*x4)/nominator,
 		  y: (x1*y2-y1*x2)*(y3-y4)-(y1-y2)*(x3*y4-y3*x4)/nominator};
-    console.log("returning from intersecting " + JSON.stringify(result));
     return result;
 };
 
 Bezier2Poly.prototype.filletConvert = function(array, init) {
-    console.log("filletConvert with " + JSON.stringify(array));
     return this.convert(array, init, function(result,a_rray) {
-	console.log("returning intersection of a_rray " + a_rray);
 	var crosspoint = Bezier2Poly.intersect([{x:0,y:0},a_rray[0]],[a_rray[2],{x:a_rray[2].x-a_rray[1].x, y:a_rray[2].y-a_rray[1].y}]);
 	if (crosspoint) {
+	    crosspoint.fr = 0;
 	    result.push(crosspoint);
-    	    result.push({x:a_rray[2].x-crosspoint.x, y:a_rray[2].y-crosspoint.y});
+    	    result.push({ x:a_rray[2].x-crosspoint.x, y:a_rray[2].y-crosspoint.y, fr:-0.7 });
 	}
     });
 };
@@ -652,9 +647,7 @@ Bezier2Poly.prototype.convert = function(array, init, func) {
 	this.vertices = [];
 	this.recurs = 0;
     }
-    console.log("passed array " + JSON.stringify(array))
     if (!this.threshold) {
-	console.log("threshold is null");
 	return;
     }
     if (!init && (Math.abs(this.calculateAngleBetweenVectors(array[0], array[2], true)) < this.threshold 
@@ -663,11 +656,9 @@ Bezier2Poly.prototype.convert = function(array, init, func) {
 	func(this.vertices, array);
     } else {
 	var split = this.splitBezier(array);
-	console.log(" split.. " + JSON.stringify(split));
 	this.convert(split.b1,false,func);
 	this.convert(split.b2,false,func);
     }
-    console.log("from convert returning " + JSON.stringify(this.vertices));
     return this.vertices;
 }
 Bezier2Poly.prototype.interpolate = function (p0, p1, percent) {
@@ -1608,31 +1599,34 @@ function extendPoint(v1) {
 // result is 2 adjusted vectors and the arc object {v1: {x:.. , y:.. }, v2: {x:.., y:..}, arc: {cx:.., cy:.., r:.., x:.., y:..}}
 // cx and cy is the centerpoint of the arc.
 function doCorner (v1,v2,filletRadius) {
-      var middleAngle = bisectVectors({x:-v1.x, y:-v1.y}, {x:v2.x, y:v2.y});
-      var vv1 = extendPoint(v1); //Math.atan2(v1.y, v1.x);
-      var vv2 = extendPoint(v2); //Math.atan2(v2.y, v2.x);
-      var lengthV1 = Math.sqrt((vv1.x * vv1.x) + (vv1.y * vv1.y));
-      var lengthV2 = Math.sqrt((vv2.x * vv2.x) + (vv2.y * vv2.y));
-      var ma = Math.abs(vv1.a - vv2.a+Math.PI)/2;
-      var i2c = Math.abs(filletRadius / Math.sin(ma));
-      var i2t = Math.abs(filletRadius / Math.tan(ma));
-      var result = {
-         v1 : { x : Math.cos(vv1.a)*(lengthV1 - i2t), y : Math.sin(vv1.a)*(lengthV1 - i2t) }
-       , v2 : { x : Math.cos(vv2.a)*(lengthV2 - i2t), y : Math.sin(vv2.a)*(lengthV2 - i2t) }
-       , arc : {
-	   dxfClockWise : crossProduct(vv1,vv2) > 0
-           , r  : filletRadius
-           , reverse : vv1.reverse != undefined ? vv1.reverse : ((vv1.x * vv2.y) - (vv1.y * vv2.x)) > 0
-           , x  : i2t * (Math.cos(vv1.a) + Math.cos(vv2.a))
-	   , y  :  i2t * (Math.sin(vv1.a) + Math.sin(vv2.a))
-           , a1 : vv1.a
-           , a2 : vv2.a
-	   , cx : Math.cos(middleAngle) * i2c + Math.cos(vv1.a)*(i2t)
-           , cy : Math.sin(vv1.a)*(i2t) + Math.sin(middleAngle) * i2c
-       }
-     };
-     return result;
-   };
+    var middleAngle = bisectVectors({x:-v1.x, y:-v1.y}, {x:v2.x, y:v2.y});
+    var vv1 = extendPoint(v1); //Math.atan2(v1.y, v1.x);
+    var vv2 = extendPoint(v2); //Math.atan2(v2.y, v2.x);
+    var lengthV1 = Math.sqrt((vv1.x * vv1.x) + (vv1.y * vv1.y));
+    var lengthV2 = Math.sqrt((vv2.x * vv2.x) + (vv2.y * vv2.y));
+    if (filletRadius < 0) {
+	filletRadius = Math.abs(filletRadius) * Math.min(lengthV1,lengthV2);
+    }
+    var ma = Math.abs(vv1.a - vv2.a+Math.PI)/2;
+    var i2c = Math.abs(filletRadius / Math.sin(ma));
+    var i2t = Math.abs(filletRadius / Math.tan(ma));
+    var result = {
+        v1 : { x : Math.cos(vv1.a)*(lengthV1 - i2t), y : Math.sin(vv1.a)*(lengthV1 - i2t) }
+	, v2 : { x : Math.cos(vv2.a)*(lengthV2 - i2t), y : Math.sin(vv2.a)*(lengthV2 - i2t) }
+	, arc : {
+	    dxfClockWise : crossProduct(vv1,vv2) > 0
+            , r  : filletRadius
+            , reverse : vv1.reverse != undefined ? vv1.reverse : ((vv1.x * vv2.y) - (vv1.y * vv2.x)) > 0
+            , x  : i2t * (Math.cos(vv1.a) + Math.cos(vv2.a))
+	    , y  :  i2t * (Math.sin(vv1.a) + Math.sin(vv2.a))
+            , a1 : vv1.a
+            , a2 : vv2.a
+	    , cx : Math.cos(middleAngle) * i2c + Math.cos(vv1.a)*(i2t)
+            , cy : Math.sin(vv1.a)*(i2t) + Math.sin(middleAngle) * i2c
+	}
+    };
+    return result;
+};
 
 // Makes a corner large enough for given bitRadius
 function clearCorner (v1,v2,bitRadius,log) {
@@ -1682,7 +1676,7 @@ function clearCorner (v1,v2,bitRadius,log) {
        }
        iResult.line(result[result.length-1].v2);
        return iResult;
-   }      
+   }
 
 function duoArrow(length, angle, startPt) {
     var l = [{x:0,y:4},{x:-3,y:-4},{x:3,y:-4},{x:0,y:4},{x:length-6,y:0},{x:0,y:4},{x:3,y:-4},{x:-3,y:-4},{x:0,y:4}];
