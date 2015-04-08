@@ -636,7 +636,7 @@ Bezier2Poly.prototype.filletConvert = function(array, init) {
 	if (crosspoint) {
 	    crosspoint.fr = 0;
 	    result.push(crosspoint);
-    	    result.push({ x:a_rray[2].x-crosspoint.x, y:a_rray[2].y-crosspoint.y, fr:-0.7 });
+    	    result.push({ x:a_rray[2].x-crosspoint.x, y:a_rray[2].y-crosspoint.y});
 	}
     });
 };
@@ -1604,6 +1604,7 @@ function doCorner (v1,v2,filletRadius) {
     var vv2 = extendPoint(v2); //Math.atan2(v2.y, v2.x);
     var lengthV1 = Math.sqrt((vv1.x * vv1.x) + (vv1.y * vv1.y));
     var lengthV2 = Math.sqrt((vv2.x * vv2.x) + (vv2.y * vv2.y));
+    console.log("filletRadius " + filletRadius)
     if (filletRadius < 0) {
 	filletRadius = Math.abs(filletRadius) * Math.min(lengthV1,lengthV2);
     }
