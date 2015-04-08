@@ -180,7 +180,7 @@ var StretchSketch = (function() {
         //timers.stop();
         var instance;
         if (options["model"]) {
-        $.ajax( {url: options["model"]
+            $.ajax( {url: options["model"] + "?time=" + new Date().getTime()
            , async: false
            , timeout: 1000
            , datatype: "text"
