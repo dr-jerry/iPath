@@ -1636,7 +1636,8 @@ function clearCorner (v1,v2,bitRadius,log) {
       var ma = Math.abs(vv1.a - vv2.a+Math.PI)/2;
       var secant = Math.abs(2 * bitRadius * Math.cos(ma));
       var cx = secant * Math.cos(vv1.a) + Math.cos(middleAngle) * bitRadius;
-      var cy = secant * Math.sin(vv1.a) + Math.sin(middleAngle) * bitRadius;
+    var cy = secant * Math.sin(vv1.a) + Math.sin(middleAngle) * bitRadius;
+    
     var result = {
 	v1 : { x : Math.cos(vv1.a)*(vv1.r - secant), y : Math.sin(vv1.a)*(vv1.r - secant) }
 	, v2 : { x : Math.cos(vv2.a)*(vv2.r - secant), y : Math.sin(vv2.a)*(vv2.r - secant) }
@@ -1649,7 +1650,19 @@ function clearCorner (v1,v2,bitRadius,log) {
 	    , cx : secant * Math.cos(vv1.a) + Math.cos(middleAngle) * bitRadius
             , cy : secant * Math.sin(vv1.a) + Math.sin(middleAngle) * bitRadius
 	}
-    };
+	, poly : {
+	    l1 : {
+		x:Math.cos(vv1.a+Math.asin(bitRadius/secant))*secant
+		,y:Math.sin(vv1.a+Math.asin(bitRadius/secant))*secant
+	    }
+	}};
+    result['poly']['l2'] = {
+	x:result['arc'].x
+	, y:result['arc'].y};
+    result['poly']['l3'] = {
+	x : -1*result['poly']['l1'].x
+	, y : -1*result['poly']['l1'].y
+    }
     result['arc']['large_arc'] = false;//Math.abs(vv1.a-vv2.a).between(0.5 * Math.PI,1.5 * Math.PI);
      return result;
    };
