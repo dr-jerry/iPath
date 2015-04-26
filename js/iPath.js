@@ -1650,25 +1650,33 @@ function clearCorner (v1,v2,bitRadius,log) {
 	    , cx : secant * Math.cos(vv1.a) + Math.cos(middleAngle) * bitRadius
             , cy : secant * Math.sin(vv1.a) + Math.sin(middleAngle) * bitRadius
 	}
-	, poly : {
-	    l1 : {
-		x:Math.cos(vv1.a+Math.asin(bitRadius/secant))*secant
-		,y:Math.sin(vv1.a+Math.asin(bitRadius/secant))*secant
-	    }
-	}};
-    result['poly']['l2'] = {
-	x:result['arc'].x
-	, y:result['arc'].y};
-    result['poly']['l3'] = {
-	x : -1*result['poly']['l1'].x
-	, y : -1*result['poly']['l1'].y
     }
-    result['arc']['large_arc'] = false;//Math.abs(vv1.a-vv2.a).between(0.5 * Math.PI,1.5 * Math.PI);
+    //   (2) /\(3)_____
+    //   (1) \ 
+    //       |
+    //       |
+    //       |
+    var endPoint=extendPoint({x:result.arc.x, y:result.arc.y});
+    var earLine = extendPoint({a:endPoint.a + (result.arc.dxfClockWise ? -1 : 1) * Math.PI/2
+			       , r:Math.sqrt(secant*secant - distance * distance/4)});
+			       
+    result['poly'] = {
+	l1 : {                    //(1)
+		x : earLine.x
+		,y : earLine.y }
+	, l2 : {                  //(2)
+	    x:result['arc'].x
+	    , y:result['arc'].y }
+	,l3 : {                   //(3)
+	    x : -earLine.x
+	    , y : -earLine.y}
+    }
+    result['arc']['large_arc'] = false; //Math.abs(vv1.a-vv2.a).between(0.5 * Math.PI,1.5 * Math.PI);
      return result;
    };
 
  
-    function arcPath(lines, fr) {
+   function arcPath(lines, fr) {
        result = [{v2:lines[0]}];
        for (var x=1; x<lines.length; x++) {
            if (lines[x].br) {
@@ -1684,7 +1692,16 @@ function clearCorner (v1,v2,bitRadius,log) {
        for (var x=1; x<result.length; x++) {
           iResult.line(result[x].v1);
 	   if (result[x].arc) {
-	       iResult.arc(result[x].arc);
+	       iResult
+//		   .line(-20,-20).line(20,20)
+		   .line(result[x].poly.l1.x,result[x].poly.l1.y)
+//		   .line(20,-20).line(-20,20)
+		   .line(result[x].poly.l2.x,result[x].poly.l2.y)
+		   .line(result[x].poly.l3.x,result[x].poly.l3.y)
+		   .move(-result[x].poly.l2.x,-result[x].poly.l2.y)
+		   .arc(result[x].arc);
+ 
+
 	   }
        }
        iResult.line(result[result.length-1].v2);
