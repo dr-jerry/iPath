@@ -1629,13 +1629,14 @@ function doCorner (v1,v2,filletRadius) {
 };
 
 // Makes a corner large enough for given bitRadius
-function clearCorner (v1,v2,bitRadius,log) {
+function clearCorner (v1,v2,br) {
+    var poly = br < 0;
+    var bitRadius = Math.abs(br);
     var middleAngle = bisectVectors({x:-v1.x, y:-v1.y}, {x:v2.x, y:v2.y});
     var vv1 = extendPoint(v1); //Math.atan2(v1.y, v1.x);
     var vv2 = extendPoint(v2); //Math.atan2(v2.y, v2.x);
     var ma = Math.abs(vv1.a - vv2.a+Math.PI)/2;
     var secant = Math.abs(2 * bitRadius * Math.cos(ma));
-    console.log("ma is " + (ma/2/Math.PI)*360 + " secant is " + secant );
     var cx = secant * Math.cos(vv1.a) + Math.cos(middleAngle) * bitRadius;
     var cy = secant * Math.sin(vv1.a) + Math.sin(middleAngle) * bitRadius;
     
@@ -1652,34 +1653,40 @@ function clearCorner (v1,v2,bitRadius,log) {
             , cy : secant * Math.sin(vv1.a) + Math.sin(middleAngle) * bitRadius
 	}
     }
-    //   (2) /\(3)_____
-    //   (1) \ 
-    //       |
-    //       |
-    //       |
-    var endPoint = extendPoint({x:result.arc.x, y:result.arc.y});
-    var centrPoint = extendPoint({x:result.arc.cx, y:result.arc.cy});
-    var diffEndCentr = Math.abs(endPoint.a - centrPoint.a);
-    var earLine = extendPoint({a:endPoint.a + (result.arc.dxfClockWise ? -1 : 1) * Math.PI/2
-			       , r:Math.sqrt(secant * secant - Math.pow(bitRadius * Math.cos(diffEndCentr),2))});
-    
-    result['poly'] = {
-	l1 : {                    //(1)
-	    x : earLine.x
-	    ,y : earLine.y }
-	, l2 : {                  //(2)
-	    x:result['arc'].x
-	    , y:result['arc'].y }
-	,l3 : {                   //(3)
-	    x : -earLine.x
-	    , y : -earLine.y}
+    if (poly) {
+        //   (2) /\(3)_____
+        //   (1) \ 
+        //       |
+        //       |
+        //       |
+        var endPoint = extendPoint({x:result.arc.x, y:result.arc.y});
+        var centrPoint = extendPoint({x:result.arc.cx, y:result.arc.cy});
+        var diffEndCentr = Math.abs(endPoint.a - centrPoint.a);
+        var earLine = extendPoint({a:endPoint.a + (result.arc.dxfClockWise ? -1 : 1) * Math.PI/2
+        			       , r:Math.sqrt(secant * secant - Math.pow(bitRadius * Math.cos(diffEndCentr),2))});
+        
+        result['poly'] = {
+        	l1 : {                    //(1)
+        	    x : earLine.x
+        	    ,y : earLine.y }
+        	, l2 : {                  //(2)
+        	    x:result['arc'].x
+        	    , y:result['arc'].y }
+        	,l3 : {                   //(3)
+        	    x : -earLine.x
+        	    , y : -earLine.y}
+        }
     }
     result['arc']['large_arc'] = false; //Math.abs(vv1.a-vv2.a).between(0.5 * Math.PI,1.5 * Math.PI);
     return result;
 };
 
- 
-   function arcPath(lines, fr) {
+
+/*
+ if br = negative, the t-bone fillet is a 3 line extension instead of an arc. (The bit radius remains the same.
+*/
+
+function arcPath(lines, fr, poly) {
        result = [{v2:lines[0]}];
        for (var x=1; x<lines.length; x++) {
            if (lines[x].br) {
@@ -1696,16 +1703,9 @@ function clearCorner (v1,v2,bitRadius,log) {
            iResult.line(result[x].v1);
 	   if (result[x].poly) {
 	       iResult
-//		   .line(-20,-20).line(20,20)
 		   .line(result[x].poly.l1.x,result[x].poly.l1.y)
-//		   .line(20,-20).line(-20,20)
 		   .line(result[x].poly.l2.x,result[x].poly.l2.y)
-		   .line(result[x].poly.l3.x,result[x].poly.l3.y)
-		   .move(-result[x].poly.l2.x, -result[x].poly.l2.y)
-		   .line( result[x].arc.cx,result[x].arc.cy)
-       	           .circle(result[x].arc.r)
-		   .line(result[x].poly.l2.x - result[x].arc.cx
-			 , result[x].poly.l2.y - result[x].arc.cy)
+		   .line(result[x].poly.l3.x,result[x].poly.l3.y);
 	   } else if (result[x].arc) {
 	       iResult
 		   .arc(result[x].arc);
