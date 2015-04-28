@@ -327,7 +327,6 @@ var StretchSketch = (function() {
 		control.element = mySlider;
 		mySlider[0].data = control.defaultvalue;
 	    	mySlider.bind("slide", {control: control }, function(event, ui) {
-		    console.log("bind bind mov.y " + mov.y);
 		    event.stretchSketchValue = ui.value;
 		    this.data = ui.value;
 		    $('.slider-control-value',  $('#' + event.data.control["id"]).parent()).html(ui.value);
