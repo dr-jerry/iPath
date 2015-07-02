@@ -99,15 +99,6 @@ $( document ).ready( function() {
 	$('#loginbutton,#feedbutton').removeAttr('disabled');
 	FB.getLoginStatus(function() {console.log('updated')});
     });
-    $('#download').on("click", function(evt) {
-	$.ajax({url: 'app/jsondownload'
-		, data: {een: "jeroen", twee: "arno"}
-		, type: "POST"
-		, success: function(data) {
-		    console.log(data) }
-	       });
-	return false;
-    });
 });
 
 var toggleMenu = function(id,context) {
