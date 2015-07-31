@@ -14,12 +14,145 @@
  * specific language governing permissions and limitations under the License.
  */
 
+var utils = function(){
+  "use strict";
+
+  var _class2type = {};
+
+  var _type = function( obj ) {
+    return obj == null ?
+      String( obj ) :
+      _class2type[ toString.call(obj) ] || "object";
+  };
+
+  var _isWindow = function( obj ) {
+    return obj != null && obj == obj.window;
+  };
+
+  var _isFunction = function(target){
+    return toString.call(target) === "[object Function]";
+  };
+
+  var _isArray =  Array.isArray || function( obj ) {
+      return _type(obj) === "array";
+  };
+
+  var _isPlainObject = function( obj ) {
+    // Must be an Object.
+    // Because of IE, we also have to check the presence of the constructor property.
+    // Make sure that DOM nodes and window objects don't pass through, as well
+    if ( !obj || _type(obj) !== "object" || obj.nodeType || _isWindow( obj ) ) {
+      return false;
+    }
+
+    try {
+      // Not own constructor property must be Object
+      if ( obj.constructor &&
+        !hasOwn.call(obj, "constructor") &&
+        !hasOwn.call(obj.constructor.prototype, "isPrototypeOf") ) {
+        return false;
+      }
+    } catch ( e ) {
+      // IE8,9 Will throw exceptions on certain host objects #9897
+      return false;
+    }
+
+    // Own properties are enumerated firstly, so to speed up,
+    // if last one is own, then all properties are own.
+
+    var key;
+    for ( key in obj ) {}
+
+    return key === undefined || hasOwn.call( obj, key );
+  };
+
+  var _extend = function() {
+    var options, name, src, copy, copyIsArray, clone,
+      target = arguments[0] || {},
+      i = 1,
+      length = arguments.length,
+      deep = false;
+
+    // Handle a deep copy situation
+    if ( typeof target === "boolean" ) {
+      deep = target;
+      target = arguments[1] || {};
+      // skip the boolean and the target
+      i = 2;
+    }
+
+    // Handle case when target is a string or something (possible in deep copy)
+    if ( typeof target !== "object" && !_isFunction(target) ) {
+      target = {};
+    }
+
+    if ( length === i ) {
+      target = this;
+      --i;
+    }
+
+    for ( ; i < length; i++ ) {
+      // Only deal with non-null/undefined values
+      if ( (options = arguments[ i ]) != null ) {
+        // Extend the base object
+        for ( name in options ) {
+          src = target[ name ];
+          copy = options[ name ];
+
+          // Prevent never-ending loop
+          if ( target === copy ) {
+            continue;
+          }
+
+          // Recurse if we're merging plain objects or arrays
+          if ( deep && copy && ( _isPlainObject(copy) || (copyIsArray = _isArray(copy)) ) ) {
+            if ( copyIsArray ) {
+              copyIsArray = false;
+              clone = src && _isArray(src) ? src : [];
+
+            } else {
+              clone = src && _isPlainObject(src) ? src : {};
+            }
+
+            // Never move original objects, clone them
+            target[ name ] = _extend( deep, clone, copy );
+
+          // Don't bring in undefined values
+          } else if ( copy !== undefined ) {
+            target[ name ] = copy;
+          }
+        }
+      }
+    }
+    // Return the modified object
+    return target;
+  };
+
+  return {
+    class2type: _class2type,
+    type: _type,
+    isWindow: _isWindow,
+    isFunction: _isFunction,
+    isArray: _isArray,
+    isPlainObject: _isPlainObject,
+    extend: _extend
+  }
+}();
+
 Function.prototype.curry = function() {
     var fn = this, args = Array.prototype.slice.call(arguments);
     return function() {
 	return fn.apply(this, args.concat(Array.prototype.slice.call(arguments)));
     };
 };
+
+function extend(){
+    for(var i=1; i<arguments.length; i++)
+        for(var key in arguments[i])
+            if(arguments[i].hasOwnProperty(key))
+                arguments[0][key] = arguments[i][key];
+    return arguments[0];
+}
 
 function mod(m, n) {
     var result =  ((m % n) + n) % n;
@@ -91,7 +224,7 @@ iPath = function () { this.path = []; this.location={x:0,y:0}; this.heading=0; t
      if (typeof pt === "object") {
        pt.prefix = prefix;
        if (!pt[iPath.cs] || pt[iPath.cs] !== iPath.cartesian) {
-	  pt = $.extend(true, {x:0, y:0}, pt);
+	  pt = utils.extend(true, {x:0, y:0}, pt);
        }
        this.path.push(pt);
        return this;
@@ -105,7 +238,7 @@ iPath = function () { this.path = []; this.location={x:0,y:0}; this.heading=0; t
        if (!isNumber(x) || !isNumber(y)) {
 	   throw { name: "Invalid number", level: "critical"} ;
        }
-       this.path.push($.extend(true, {x: 0, y:0}, {x: x
+       this.path.push(utils.extend(true, {x: 0, y:0}, {x: x
 		       , y: y
 		       , prefix: prefix}));
        return this;
@@ -118,7 +251,7 @@ iPath = function () { this.path = []; this.location={x:0,y:0}; this.heading=0; t
      if (typeof pt === "object") {
        pt.prefix = prefix;
        if (!pt[iPath.cs] || pt[iPath.cs] !== iPath.cartesian) {
-	  pt = $.extend(true, {x:0, y:0}, pt);
+	  pt = utils.extend(true, {x:0, y:0}, pt);
        }
        this.path.push(pt);
        return this;
@@ -128,7 +261,7 @@ iPath = function () { this.path = []; this.location={x:0,y:0}; this.heading=0; t
        if (!isNumber(x) || !isNumber(y)) {
 	   throw { name: "Invalid number", level: "critical"} ;
        }
-       this.path.push($.extend(true, {x: 0, y:0}, {x: x
+       this.path.push(utils.extend(true, {x: 0, y:0}, {x: x
 		       , y: y
 		       , prefix: prefix}));
        return this;
@@ -185,7 +318,7 @@ addMethod(iPath.prototype, 'turtleBezier', function (pt) {
 	return this.travel(pt, 'c');
     });
 addMethod(iPath.prototype, 'rectBezier', function (pt, options) {
-	var settings = $.extend({ xFact: 1
+	var settings = utils.extend({ xFact: 1
 				  , yFact: 1
 				  , angle: 0}
 	    , options || {});
@@ -233,12 +366,12 @@ iPath.prototype.utilFunctions= {normalize: function(v) {
                                 }
 				, reverse: 
 		      { controlPoint : function (endPoint, controlPoint) {
-    var ep = $.extend(true, {x:0, y:0}, endPoint);
-    var cp = $.extend(true, {x:0, y:0}, controlPoint);
+    var ep = utils.extend(true, {x:0, y:0}, endPoint);
+    var cp = utils.extend(true, {x:0, y:0}, controlPoint);
     return { x: cp.x - ep.x, y: cp.y - ep.y };
 		      },
 			point : function(point) {
-    var element = $.extend(true, {}, point);
+    var element = utils.extend(true, {}, point);
     if (element.cp2 && element.cp1) {
 	var temp = element.cp1;
 	element.cp1 = element.cp2;
@@ -330,14 +463,14 @@ iPath.prototype.reverse= function(arg) {
 		    resultPath.push(fn.call(this, target.path[i], target.path[i]));
 		}
 	    } else {
-		var element = $.extend(true, {}, target.path[i]);
+		var element = utils.extend(true, {}, target.path[i]);
 		if (element.cp1) {
 		    element.cp1 = fn.call(this, element.cp1);
 		}
 		if (element.cp2) {
 		    element.cp2 = fn.call(this, element.cp2);
 		}
-		$.extend(element, fn.call(this, element));
+		utils.extend(element, fn.call(this, element));
 		resultPath.push(element);
 	        this.previousPoint = element;
 
@@ -357,7 +490,7 @@ iPath.prototype.reverse= function(arg) {
  
     iPath.prototype.reflect= function() {
 	var args = $.makeArray(arguments);
-	var reflectionVector  = $.extend(true, {x:0, y:0}, args.shift());
+	var reflectionVector  = utils.extend(true, {x:0, y:0}, args.shift());
 	var hypotenuse = Math.sqrt((reflectionVector.x * reflectionVector.x) + (reflectionVector.y * reflectionVector.y));
 	// I'm almost sure the negation of x-attribute has a good reason..
 	var normalizedReflectionVector = {x: -reflectionVector.x/hypotenuse, y:reflectionVector.y/hypotenuse};
@@ -371,7 +504,7 @@ iPath.prototype.reverse= function(arg) {
 
 	    if (pt[iPath.cs] === iPath.polar) {
 	       if (pt['A'] !== undefined) {
-	       	  return $.extend(true, pt, {A:2*Math.atan2(n.y, -1*n.x) - pt.A});
+	       	  return utils.extend(true, pt, {A:2*Math.atan2(n.y, -1*n.x) - pt.A});
 	       }
 
      // // again negate the x-attribute.
@@ -382,7 +515,7 @@ iPath.prototype.reverse= function(arg) {
      //  \ ) alpha
      //   \ 
      //    \
-	       return $.extend(true, pt, {a:- pt.a});
+	       return utils.extend(true, pt, {a:- pt.a});
 	    }
 	    var dot = function (v1,v2){
 		return (v1.x*v2.y) + (v1.y*v2.x);
@@ -454,9 +587,9 @@ iPath.prototype.reverse= function(arg) {
 	    }
 	    if (pt[iPath.cs] === iPath.polar) {
 	        if ('A' in pt) {
-	            return $.extend(true, pt, {A: pt.A ? pt.A + angle : angle});
+	            return utils.extend(true, pt, {A: pt.A ? pt.A + angle : angle});
 		} else if (!this.previousPoint) {
-	            return $.extend(true, pt, {a: (pt.a ? pt.a + angle : angle)});
+	            return utils.extend(true, pt, {a: (pt.a ? pt.a + angle : angle)});
 		} else 
                 return pt;
 	    } else {
@@ -568,7 +701,7 @@ iPath.prototype.polar2Cartesian= function(elem, builder, leaveHeading) {
     if(elem[iPath.cs] === iPath.cartesian) return elem;
     if(typeof elem[iPath.alpha] === 'undefined'  && typeof elem[iPath.Alpha] === 'undefined'
        && typeof elem[iPath.radius] === 'undefined') return elem;
-    var result = $.extend(true, {}, elem);  
+    var result = utils.extend(true, {}, elem);  
     var oldHeading = builder.heading;
     if (typeof result[iPath.alpha] === 'number') {
 	builder.heading += result[iPath.alpha];
@@ -711,7 +844,7 @@ PathBuilder.prototype.signify = function(number) {
 }
 
 PathBuilder.prototype.move = function(pt, absolut) {
-    pt = $.extend(true,{x:0, y:0, absolute: absolut }, pt);
+    pt = utils.extend(true,{x:0, y:0, absolute: absolut }, pt);
     this.moveCache.push(pt);
 }
 
@@ -734,7 +867,7 @@ PathBuilder.prototype.prepareFlush = function (start) {
     this.moveCache = this.ditchAllButLastAbsoluteAndEverythingAfter(this.moveCache, typeof start !== 'undefined');
     // startPt as argument for rendering overrides the embedded startPt, needs to reset the location.
     if (start) {
-	absolute = $.extend({x:0, y:0}, start || {});
+	absolute = utils.extend({x:0, y:0}, start || {});
 	resetLocation = true
 	this.location.x = absolute.x;
 	this.location.y = absolute.y;
@@ -792,7 +925,7 @@ svgBuilder.prototype.circle = function(r) {
 }
 
 svgBuilder.prototype.lineMove = function(point) {
-        var pt = $.extend(true, {x:0, y:0,prefix: 'l'}, point);
+        var pt = utils.extend(true, {x:0, y:0,prefix: 'l'}, point);
 
 	if (pt.prefix === 'm') {
 	    this.move(pt, false);
@@ -899,8 +1032,8 @@ reverseBuilder.prototype.lineMove = function(pt) {
 
 reverseBuilder.prototype.bezier = function(pt) {
      reverseControlPoint = function (endPoint, controlPoint) {
-         var ep = $.extend(true, {x:0, y:0}, endPoint);
-         var cp = $.extend(true, {x:0, y:0}, controlPoint);
+         var ep = utils.extend(true, {x:0, y:0}, endPoint);
+         var cp = utils.extend(true, {x:0, y:0}, controlPoint);
          return { x: cp.x - ep.x, y: cp.y - ep.y };
      }
 }
@@ -937,166 +1070,7 @@ Blobber.prototype.getText= function(){
     return this.arrayText.join("");
 }
 
-DxfBuilder = function(blobber, snfc) {
-    PathBuilder.apply(this);
-    if (snfc) { this.significance = snfc; }
-    this.blobBuilder = blobber;
-    this.virgin = true;
-    this.layers={};
-    this.extra_elements = [];
-}
 
-DxfBuilder.prototype = new PathBuilder();
-
-DxfBuilder.prototype.isVirgin = function(experienced) {
-    if(experienced) {
-	var result = this.virgin;
-	this.virgin = false;
-	return result;
-    }
-    return(this.virgin);
-}
-
-DxfBuilder.prototype.incorporateOptions = function(options) {
-    this.startPoint = options.startPoint ? $.extend({x:0, y:0}, options.startPoint) : undefined;
-    this.layers[options.layer.name ] = options.layer;
-    this.focusLayer = options.layer.name;
-    this.focusColor = options.color;
-    this.bezierPoly = new Bezier2Poly(options.bezier_tolerance);
-}
-
-DxfBuilder.prototype._flush = function () {
-    var moves = this.prepareFlush(this.isVirgin() ? this.startPoint : undefined);
-    var x=this.location.x, y=this.location.y;
-    if (moves.relative || moves.absolute || this.isVirgin()) {
-	if (moves.absolute) {
-	    // the location knows where you are.
-	    // x += moves.relative.x;
-	    // y += moves.relative.y;
-	}
-	if (moves.relative) {
-	    // the location knows where you are.
-	    // x += moves.relative.x;
-	    // y += moves.relative.y;
-	}
-	this.blobBuilder.append((this.isVirgin(true) ? "" : "\n  0\n*SEQRET*") + "\n  0\nPOLYLINE\n  6\nSOLID\n 62" 
-				+ "\n" + (this.focusColor || "256") 
-				+ "\n  8\n" + (!this.focusLayer || this.focusLayer === 'default' ? "0" : this.focusLayer) 
-				+ "\n 66\n1\n 10\n0.0\n 20\n0.0\n 30\n0.0\n 70\n0"  // todo: last 70 maybe adjusted to reflect closed polygon lines.
-				+ "\n  0\nVERTEX\n  8\n" + (!this.focusLayer || this.focusLayer === 'default' ? "0" : this.focusLayer) 
-				+ "\n 10\n" + this.signify(x) 
-				+ "\n 20\n" + this.signify(y) + "\n 30\n0");
-    }
-}
-
-DxfBuilder.prototype.lineMove = function(pt) {
-	pt = $.extend(true, {x:0, y:0,prefix: 'l'}, pt);
-	if (pt.prefix === 'm') {
-	    this.move(pt, false);
-	} else if (pt.prefix === 'M') {
-	    this.move(pt, true);
-	} else {
-	    this._flush();
-	    this.blobBuilder.append("\n  0\nVERTEX\n  8\n" + (!this.focusLayer || this.focusLayer === 'default' ? "0" : this.focusLayer) 
-				    + "\n 10\n" + this.signify(this.location.x + pt.x) + "\n 20\n" + this.signify(this.location.y + pt.y) + "\n 30\n0");
-	}
-}
-// 280, 20 -> 20, 280 (280-20 > 180 && 20 < 180)
-//
-
-DxfBuilder.prototype.arc = function(arc) {
-    this._flush();
-    if (!arc.cx === undefined || !arc.cy === undefined) {
-	throw "center x & center y need to be specified in cx, cy"; 
-    }
-    this.arcElement = function(arc) {
-	var a = mod(Math.atan2(-arc.cy, -arc.cx) / 2 / Math.PI * 360, 360);
-        var b = mod(Math.atan2(arc.y-arc.cy, arc.x-arc.cx) / 2 / Math.PI * 360,360);
-	// clockWise: orientation is from large numbers to small numbers.
-	var orientation = a-b > 0 ? arc.dxfClockWise : !arc.dxfClockWise;
-	var angles = [orientation ? Math.max(a,b) : Math.min(a,b), orientation ? Math.min(a,b) : Math.max(a,b)];
-	return "\n  0\nARC\n  8\n" + (!this.focusLayer || this.focusLayer === 'default' ? "0" : this.focusLayer)
-	    + "\n 10\n" + this.signify(this.location.x + arc.cx)+ "\n 20\n" 
-	    + this.signify(this.location.y + arc.cy) +"\n 30\n0.0\n 40\n" + this.signify(arc.r) + "\n 50\n" + this.signify(angles[arc.large_arc ? 1 : 0]) 
-            + "\n 51\n" + this.signify(angles[arc.large_arc ? 0 : 1]);
-    }
-    this.extra_elements.push(this.arcElement(arc));
-    this.move(arc, false);
-}
-
-DxfBuilder.prototype.circle = function(r) {
-    this._flush();
-    this.extra_elements.push("\n  0\nCIRCLE\n  8\n" + (!this.focusLayer || this.focusLayer === 'default' ? "0" : this.focusLayer) 
-				    + "\n 10\n" + this.signify(this.location.x)+ "\n 20\n" 
-			    + this.signify(this.location.y) +"\n 30\n0.0\n 40\n" + r);
-}
-
-DxfBuilder.prototype.bezier = function(pt) {
-    this._flush();
-    var pb = new PathBuilder(4);
-    var bezier = $.extend(true,{x:0, y:0, cp1:{x:0, y:0}}, pt);
-    // Make from a quadratic a cubic bezier curve.
-    if (! bezier.cp2 ) {
-	bezier.cp2 = {x: bezier.cp1.x, y:bezier.cp2.y};
-    } else {
-	bezier.cp2 = $.extend(true, {x:0, y:0}, bezier.cp2);
-    }
-    var vertices = this.bezierPoly.convert([{x:bezier.cp1.x, y:bezier.cp1.y}, {x:bezier.cp2.x, y:bezier.cp2.y}, {x:bezier.x, y:bezier.y}], true);
-    var tempLocation = {}; 
-    tempLocation.x = this.location.x;
-    tempLocation.y = this.location.y;
-    vertices.forEach(function(elem){
-	    tempLocation.x += elem.x;
-	    tempLocation.y += elem.y;
-	    this.blobBuilder.append("\n  0\nVERTEX\n  8\n" + (!this.focusLayer || this.focusLayer === 'default' ? "0" : this.focusLayer) 
-				    + "\n 10\n" + this.signify(tempLocation.x) + "\n 20\n" + this.signify(tempLocation.y) + "\n 30\n0");
-	}, this);
-}
-
-DxfBuilder.prototype.getHeader = function(layers,secret, uom) {
-    var result = "  0\nSECTION\n  2\nHEADER\n  9\n$ACADVER\n  1\nAC1009\n  9\n$EXTMIN\n 10\n0.0\n 20\n0.0\n 30\n0.0\n  9\n$EXTMAX\n 10\n100.0\n 20\n100.0\n 30\n0.0\n  9\n$INSBASE\n 10\n0.0\n 20\n0.0\n 30\n0.0\n  9\n$INSUNITS\n 70\n*UNITSOFMEASUREMENT*\n0\nENDSEC\n  0\nSECTION\n  2\nTABLES\n  0\nTABLE\n  2\nLTYPE\n 70\n19\n  0\nENDTAB\n  0\nTABLE\n  2\nLAYER\n 70\n6\n  0\nLAYER\n  2\nDIMENSIONS\n 70\n0\n 62\n1\n  6\nCONTINUOUS\n  0\nLAYER\n  2\nTABLECONTENT\n 70\n0\n 62\n1\n  6\nCONTINUOUS\n  0\nLAYER\n  2\njeroen\n 70\n0\n 62\n5\n  6\nCONTINUOUS*LAYERS*\n  0\nLAYER\n  2\nTABLEBACKGROUND\n 70\n0\n 62\n1\n  6\nCONTINUOUS\n  0\nLAYER\n  2\nTABLEGRID\n 70\n0\n 62\n1\n  6\nCONTINUOUS\n  0\nLAYER\n  2\nVIEWPORTS\n 70\n0\n 62\n7\n  6\nCONTINUOUS\n  0\nENDTAB\n  0\nTABLE\n  2\nSTYLE\n 70\n12\n  0\nENDTAB\n  0\nTABLE\n  2\nVIEW\n 70\n0\n  0\nENDTAB\n  0\nTABLE\n  2\nAPPID\n 70\n1\n  0\nAPPID\n  2\nDXFWRITE\n 70\n0\n  0\nENDTAB\n  0\nTABLE\n  2\nVPORT\n 70\n0\n  0\nENDTAB\n  0\nTABLE\n  2\nUCS\n 70\n0\n  0\nENDTAB\n  0\nENDSEC\n  0\nSECTION\n  2\nBLOCKS\n  0\nENDSEC\n  0\nSECTION\n  2\nENTITIES\n  0\nVIEWPORT\n  8\nVIEWPORTS\n 67\n1\n 10\n0.0\n 20\n0.0\n 30\n0.0\n 40\n1.0\n 41\n1.0\n 68\n1\n 69\n1\n1001\nACAD\n1000\nMVIEW\n1002\n{\n1070\n16\n1010\n0.0\n1020\n0.0\n1030\n0.0\n1010\n0.0\n1020\n0.0\n1030\n0.0\n1040\n0.0\n1040\n1.0\n1040\n0.0\n1040\n0.0\n1040\n50.0\n1040\n0.0\n1040\n0.0\n1070\n0\n1070\n100\n1070\n1\n1070\n3\n1070\n0\n1070\n0\n1070\n0\n1070\n0\n1040\n0.0\n1040\n0.0\n1040\n0.0\n1040\n0.1\n1040\n0.1\n1040\n0.1\n1040\n0.1\n1070\n0\n1002\n{\n1002\n}\n1002\n}";
-    var layertext = "";
-    Object.keys(layers).forEach(function(layer) { layertext += "\n  0\nLAYER\n  2\n" + layer + "\n 70\n0\n 62\n" + (this.layers[layer]["layer_color"] || "7") +" \n  6\nCONTINUOUS" }, this);
-    result = result.replace(/\*LAYERS\*/g, layertext);
-    uom = uom || 'mm';
-    var uom2DXF = { 'unitless': '0'
-		, 'inches':'1'
-		, 'feet':'2', 'miles':'3'
-		, 'millimeters':'4', 'mm':'4'
-		, 'centimeters':'5', 'cm':'5'
-		, 'meters':'6', 'm':'6'
-		, 'kilometers':'7', 'km':'7'
-		, 'microinches':'8', 'mils':'9', 'yards':'10', 'angstroms':'11', 'nanometers':'12'};
-    var dxfUom =  uom2DXF[uom.toLowerCase()];
-    result = result.replace(/\*UNITSOFMEASUREMENT\*/g, uom2DXF[uom.toLowerCase()]);
-    return result;
-}
-
-DxfBuilder.prototype.getBlob = function(secret, uom) {
-    //bb = new window.BlobBuilder(); // window.BlobBuilder is set in index.html
-    this.blobBuilder.prepend(this.getHeader(this.layers, secret, uom));
-    this.blobBuilder.append("\n  0\nENDSEC\n  0\nEOF");
-    for (var i=0;i<this.blobBuilder.arrayText.length;i++) {
-	this.blobBuilder.arrayText[i] = this.blobBuilder.arrayText[i].replace(/\*SEQRET\*/g, secret);
-    }
-//    bb.append(this.blobBuilder.text.replace(/\*SEQRET\*/g, secret));
-    return new Blob(this.blobBuilder.arrayText, {type: 'text/plain'});
-}
-
-
-iPath.prototype.dxf = function(dxfBuilder, options) {
-    options = $.extend(true, {layer: {name: 'default', layer_color: "7" }, bezier_tolerance: 0.12}, options || {});
-    dxfBuilder.incorporateOptions(options);
-    dxfBuilder.virgin = true;
-    this.traverse(dxfBuilder);
-    dxfBuilder.blobBuilder.append("\n  0\n*SEQRET*");
-    dxfBuilder.extra_elements.forEach(function (element) {
-	dxfBuilder.blobBuilder.append(element);
-    });
-    dxfBuilder.extra_elements = [];
-    dxfBuilder.moveCache = [];
-    return dxfBuilder;
-}
 
 iPath.prototype.traverse = function(builder) {
     for (var i=0;i<this.path.length;i++) {
@@ -1111,7 +1085,7 @@ iPath.prototype.traverse = function(builder) {
 	    this.path[i].traverse(builder);
 	    continue;
 	}
-	var element = $.extend({ x: 0, y: 0 }, this.path[i]);
+	var element = utils.extend({ x: 0, y: 0 }, this.path[i]);
 	var converter = this.cartesian2Cartesian;
 	if (element.prefix.indexOf('repeat') != -1) {
 	    if (element.prefix === 'repeat') {
@@ -1125,7 +1099,7 @@ iPath.prototype.traverse = function(builder) {
 	    }
 	}
 	if (element.prefix.indexOf('store') != -1) {
-	    this.labels[element.label] = { location: $.extend({}, builder.location), heading: $.extend({},builder.heading) };
+	    this.labels[element.label] = { location: utils.extend({}, builder.location), heading: utils.extend({},builder.heading) };
 	    continue;
 	}
 	if (element.prefix.indexOf('line2Label') != -1) {
@@ -1203,7 +1177,7 @@ iPath.prototype.traverse = function(builder) {
 				var lngth = this.path.length;
 				for (var i=0;i<lngth;i++) {
 				    var newHeading = this.heading;
-				    var element = $.extend({ x: 0, y: 0 }, this.path[i]);
+				    var element = utils.extend({ x: 0, y: 0 }, this.path[i]);
 				    var converter = this.cartesian2Cartesian;
 				    if (element.prefix.indexOf('repeat') != -1) {
 					if (element.prefix === 'repeat') {
@@ -1293,7 +1267,7 @@ iPath.prototype.pensEdge= function(distance, depth, numberOfPens, options) {
 	}
     }
 
-    var settings = $.extend ({
+    var settings = utils.extend ({
 	    startWithEar: false
 	    , overshoot: 0
 	    , bitRadius: 0
@@ -1346,7 +1320,7 @@ iPath.prototype.squareHole= function(h, b, options) {
 	    return new iPath().line(-bitRadius, 0).line(0,-2*bitRadius).line(bitRadius,0);
 	}
     }
-    var settings = $.extend ({
+    var settings = utils.extend ({
 	    widthCorrection: 0
 	    , heightCorrection: 0
 	    , bitRadius: 0 
@@ -1394,9 +1368,9 @@ iPath.prototype.boxEdge = function(x, y, settings) {
       alert('settings is not an object');
       throw new Error(" Settings is not an object");
    }
-   var options = $.extend ({ correction: 0, bit_radius: 0, modify_end_point: false, calc_pen_length: false
+   var options = utils.extend ({ correction: 0, bit_radius: 0, modify_end_point: false, calc_pen_length: false
 			     , reverse: false, fit_correction: 0, make_hole: false}, this.settings, settings || {});
-   options = $.extend({ start_correction: options.correction, end_correction: options.correction} , options);
+   options = utils.extend({ start_correction: options.correction, end_correction: options.correction} , options);
     if (!options.preferred_pen_length) {
 	throw new Error("preferred_pen_length nog defined within settings");
     }
@@ -1580,9 +1554,9 @@ function crossProduct (v1, v2) {
 function extendPoint(v1) {
     var result = {};
     if (v1.x == undefined && v1.y == undefined && v1.a !== undefined && v1.r !== undefined) {
-	$.extend(result, {x : Math.cos(v1.a) * v1.r, y : Math.sin(v1.a) * v1.r}, v1);
+	utils.extend(result, {x : Math.cos(v1.a) * v1.r, y : Math.sin(v1.a) * v1.r}, v1);
     } else if (v1.x !== undefined && v1.y !== undefined && v1.a == undefined && v1.r == undefined) {
-	$.extend(result, {a : Math.atan2(v1.y, v1.x), r: Math.sqrt((v1.x * v1.x) + (v1.y * v1.y))}, v1);
+	utils.extend(result, {a : Math.atan2(v1.y, v1.x), r: Math.sqrt((v1.x * v1.x) + (v1.y * v1.y))}, v1);
     }
     return result;
 }
@@ -1789,7 +1763,7 @@ words.form=function(w) {
     this.loop(w.split(' '), function(word, j) {
         this.loop(word.split(''), function(char, i) {
 	    if (typeof words[char] === 'undefined') return true;
-		    var character = $.extend(true, new iPath(), words[char]);
+		    var character = utils.extend(true, new iPath(), words[char]);
 		    if (i !== 0 && result.path.length > 0) {
 		        element = result.path[result.path.length-1];
 		        direction = result._direct(element);
