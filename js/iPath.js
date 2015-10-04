@@ -489,7 +489,7 @@ iPath.prototype.reverse= function(arg) {
 
  
     iPath.prototype.reflect= function() {
-	var args = $.makeArray(arguments);
+	var args = Array.prototype.slice.call(arguments);
 	var reflectionVector  = utils.extend(true, {x:0, y:0}, args.shift());
 	var hypotenuse = Math.sqrt((reflectionVector.x * reflectionVector.x) + (reflectionVector.y * reflectionVector.y));
 	// I'm almost sure the negation of x-attribute has a good reason..
@@ -544,7 +544,7 @@ iPath.prototype.reverse= function(arg) {
 	    return {x : (ya-pt.y)*sk + pt.x* (1 - ya * sk)
 		    , y : pt.y};
 	}
-	var args = $.makeArray(arguments)
+	var args = Array.prototype.slice.call(arguments)
 	,partialFn = skew.curry(args.shift(), args.shift());
 	args.unshift(partialFn);
 	return this.iterate.apply(this, args);
