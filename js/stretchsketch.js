@@ -60,6 +60,7 @@ function selectTiles(tag) {
 }
 
 $( document ).ready( function() {
+    $('.desc').hide();
    var cnt = $('.container');
     var match
         , pl     = /\+/g  // Regex for replacing addition symbol(+) with a space
@@ -167,7 +168,14 @@ var StretchSketch = (function() {
     StretchSketch.load = function load(sts) {
         var renderer = function(event) {
             if(event) {
-                eval(event.data.control["var"] + '=' + event.stretchSketchValue);
+		try {
+                    eval(event.data.control["var"] + '=' + event.stretchSketchValue);
+		} catch(e) {
+		    console.log(e);
+		    if (e instanceof SyntaxError) {
+			alert(e.message);
+		    }
+		}
                 $('div.svg svg').replaceWith(event.data.control.stretchSketch.evalJSVG());
             } else {
 		    $('div.svg svg').replaceWith(instance.evalJSVG());
@@ -410,8 +418,8 @@ var StretchSketch = (function() {
         result = result.replace(/\${(.*?)}\$/g, function(str, evalstr) {
             try {
                 eval(evalstr);
-            } catch (error) {
-		console.log("erorror =s " + error + evalstr);
+            } catch (myError) {
+		console.log(JSON.stringify(myError) + " erorror = '" + myError + "'" + evalstr + "lineNumber " + myError.lineNumber);
 //               alert("error on " + error + ' >>>' + evalstr);
             }
             // gets evaluated but returns empty string, used for declarations.
