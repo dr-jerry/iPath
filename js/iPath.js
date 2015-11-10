@@ -1785,3 +1785,148 @@ words.form=function(w) {
 
 
 
+/*
+   boxEdge providing pens on the edge of a sheet special for a simple box joint.
+   x,y are the endpoints, if you need to have 2 sheets perpendicular you will most
+   likely need to correct for insets (thickness of wood). start_correction & end_correction or just correction
+   for symmetrical corrections can be provided in the edges. 
+   if modify_end_point = true (defaults to false) is passed in as a setting, the end point is modified for 
+   the corrections. Otherwise
+   As (x, y) are both leading, the caller needs to assure to correct these values for the supplied corrections. 
+   boxEdge manipulates existing iPath.
+   option calc_pen_length indicates to return an object {nr: number of sides, length: lenght of one pen}
+   fit_correction (default 0) shrinks only the positive (male) joints with assigned value, to allow for easier sliding.
+   make_hole (default false) creates wholes of the negative (female) joints
+*/
+iPath.prototype.boxEdge = function(x, y, settings) {
+   if (settings != undefined && typeof settings !== 'object') {
+      alert('settings is not an object');
+      throw new Error(" Settings is not an object");
+   }
+   var options = utils.extend ({ correction: 0, bit_radius: 0, modify_end_point: false, calc_pen_length: false
+			     , reverse: false, fit_correction: 0, make_hole: false}, this.settings, settings || {});
+   options = utils.extend({ start_correction: options.correction, end_correction: options.correction} , options);
+    if (!options.preferred_pen_length) {
+	throw new Error("preferred_pen_length nog defined within settings");
+    }
+    if (options.pens_height === undefined || options.bit_radius < 0) {
+	throw new Error("pens_height not defined within settings or bit_radius < 0");
+    }
+   var calcPenLength = function (totalLength, preferredLength) {
+       var nr = totalLength/preferredLength;
+       var rNr = Math.round(nr);
+       if (rNr % 2) {
+          var result = {nr : rNr, lngth: totalLength/rNr};
+          return result;
+       } else {
+          if (nr >= rNr) {
+             var cNr = rNr + 1;
+          } else {
+             var cNr = rNr - 1;
+          }
+          return { nr : cNr, lngth: totalLength/cNr }
+       }
+    };
+
+      // 
+      //  below the low or south lines of the joints hence the center of the piece is above.
+      //  Clockwise is defined as reverse, and negative as joints towards the center (female).
+      //  o = milling bit.
+
+      // A /\____/\      Reverse  Negative    startWithEar     earAngle (4)      earTurn(4)      baseTurn(2)      
+      //   \o     /
+      //  __|^   |__         0        1           0            -Math.PI/4       Math.PI/2 (4)     -Math.PI/2
+      //  >  	  >
+      // 	                 
+      // B___/\    /\ __                
+      //  >  o/    \   >                  
+      //      |____|^        0        0           1            -Math.PI/4       Math.PI/2          -Math.PI/2
+	 		                 
+	 		                 
+	 		                 
+      // C ___/\    /\ __               
+      //   <  o/    \   <                  
+      //      ^|_____|       1        0           1            Math.PI/4        -Math.PI/2           MathPI/2
+	 		                 
+      // D  /\____/\	                 
+      //    \     o/         1        1           0            Math.PI/4        -Math.PI/2           MathPI/2
+      //   __|   ^|__        ___________________________________________________________________________________
+      //   <         <        Onderdestreep     !N        (R?1:-1) x Math.PI/4   -2*earAngle         2 * earAngle
+ 
+   var angle = Math.atan2(y,x);
+   var steering = calcPenLength(Math.sqrt(x*x + y*y) + (options.modify_end_point ? 0 : options.start_correction + options.end_correction), options.preferred_pen_length);
+    
+   if (options.calc_pen_length) {
+      options.calc_pen_length.nr = steering.nr;
+      options.calc_pen_length.lngth = steering.lngth;
+   }
+    var startWithEar = options.pens_height >= 0;
+    var createHole = !startWithEar && options.make_hole;
+    var fitCorrection = startWithEar ? options.fit_correction : (createHole ? -1*options.fit_correction : 0);
+    var earAngle = options.reverse ? Math.PI/4 : -Math.PI/4;
+    options.startWithEar = startWithEar;
+    var baseTurn = 2 * earAngle;
+    if (options.bit_radius) {
+        var ear = new iPath().turtleLine({a:earAngle, r:options.bit_radius});
+            ear.turtleLine({a:-2*earAngle, r:2*options.bit_radius});
+	    ear.turtleLine({a:-2*earAngle, r:options.bit_radius})
+	    ear.turtleLine({a:earAngle, r:0 });
+    } else {
+        var ear = new iPath().turtleLine({a:-2*earAngle, r:0});
+    }
+    var bitCorrection = options.bit_radius * Math.sqrt(2);
+    var netPenHeight = Math.abs(options.pens_height) 
+	- (createHole ? 2 :1) * Math.abs(bitCorrection);
+
+   options.start_correction += (startWithEar ? bitCorrection : 0) - fitCorrection;
+   options.end_correction += (startWithEar ? bitCorrection : 0) - fitCorrection;
+    if (!createHole) {
+	this.turtleLine({A: angle, r: steering.lngth - options.start_correction  });
+    } else  {
+	this.turtleMove({A: angle - Math.PI/2, r:bitCorrection })
+	    .turtleMove({a: Math.PI/2, r: steering.lngth - options.start_correction  });
+    }
+
+
+      // A /\_______/\     
+      //   \o        /   |
+      //  __|^      |    | Thickness wood
+      //   / _______ \   |                 | bitCorrection
+      //   \/       \/
+     //
+     //
+   for (var i= (steering.nr-3)/2; i >= 0; i--) {
+       if (startWithEar) {
+           this.concat(ear);
+	   this.turtleLine({a:0, r:netPenHeight});
+	   this.turtleLine({a:baseTurn, r:0});
+       } else {
+	   this.turtleLine({a:baseTurn, r:netPenHeight});
+	   this.concat(ear);
+       }
+       this.turtleLine({a: 0, r: steering.lngth - (startWithEar ? 0 : 2) * bitCorrection - 2 * fitCorrection });
+       if (startWithEar) {
+	   this.turtleLine({a:baseTurn, r:netPenHeight});
+           this.concat(ear);
+       } else {
+	   this.concat(ear);
+	   this.turtleLine({r:netPenHeight});
+	   if (!createHole) {
+	       this.turtleLine({a: baseTurn});
+	   }
+       }
+       if (!createHole) {
+	   this.turtleLine({r: steering.lngth-( i == 0 ? options.end_correction : (startWithEar ? 2 * (bitCorrection-fitCorrection) : 0)) });
+       } else {
+	   this.concat(ear);
+	   this.turtleLine({r:steering.lngth - (startWithEar ? 0 : 2) * bitCorrection - 2 * fitCorrection });
+	   this.concat(ear);
+	   this.turtleMove({a: Math.PI/2, r:2* steering.lngth - ( i == 0 ? options.end_correction :0 )});
+       }
+   }
+    if (createHole) {
+	this.turtleMove({a:Math.PI/2, r:bitCorrection});
+        this.turtleMove({a:Math.PI/2, r:2*fitCorrection});
+    }
+   return this;
+};
