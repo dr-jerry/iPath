@@ -18,7 +18,7 @@ var utils = function(){
   "use strict";
 
   var _class2type = {};
-
+  var hasOwn = _class2type.hasOwnProperty;
   var _type = function( obj ) {
     return obj == null ?
       String( obj ) :
