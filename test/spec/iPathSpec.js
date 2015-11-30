@@ -479,6 +479,9 @@ describe("iPath", function() {
     it("tests clearcorner, clearing a from 3 o'clock till 7 o'clock (svg)", function() {
 	expect(JSON.stringify(clearCorner({x:-40,y:0}, {x:10,y:40}, 2), signy)).toEqual('{"v1":{"x":-36.847,"y":0},"v2":{"x":9.235,"y":36.941},"arc":{"dxfClockWise":false,"r":2,"reverse":false,"x":-2.388,"y":3.059,"cx":-1.576,"cy":1.231,"large_arc":false}}');
     });
+    it("tests clearcorner with 180 degrees", function() {
+	expect('{"x":9,"y":9}').toEqual(JSON.stringify(clearCorner({x:5,y:5},{x:4,y:4},2)));
+    });
     it("tests arcPath with different radii and rotation in svg and dxf", function() {
 	var crn = arcPath([{x:80,y:0},{x:0,y:-80,fr:20},{x:-160,y:-60,fr:2*20},{x:0,y:140,fr:20/2},{x:80,y:0,fr:20*0.1}]).rotate(Math.PI/4);
 	expect('l.42.426.42.426.a.20.20.0.0.0.28.284.0..l.22.825.-22.825.a.40.40.0.0.0.8.13.-44.836..l.-53.269.-117.192.a.10.10.0.0.0.-16.175.-2.933..l.-87.377.87.377.a.2.2.0.0.0.0.2.828..l.55.154.55.154').toEqual(jasmineFix(crn.dPath(3)));

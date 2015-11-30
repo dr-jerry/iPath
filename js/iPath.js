@@ -129,13 +129,20 @@ var utils = function(){
   };
 
   return {
-    class2type: _class2type,
-    type: _type,
-    isWindow: _isWindow,
-    isFunction: _isFunction,
-    isArray: _isArray,
-    isPlainObject: _isPlainObject,
-    extend: _extend
+      class2type: _class2type,
+      type: _type,
+      isWindow: _isWindow,
+      isFunction: _isFunction,
+      isArray: _isArray,
+      isPlainObject: _isPlainObject,
+      extend: _extend
+      , dot : function (v1,v2){
+	  return (v1.x*v2.y) + (v1.y*v2.x)
+      }
+      , EPSILON : parseFloat("1e-10")
+      , hypotenuse : function(v) {
+	  return Math.sqrt((v.x * v.x) + (v.y * v.y));
+      }
   }
 }();
 
@@ -1578,7 +1585,6 @@ function doCorner (v1,v2,filletRadius) {
     var vv2 = extendPoint(v2); //Math.atan2(v2.y, v2.x);
     var lengthV1 = Math.sqrt((vv1.x * vv1.x) + (vv1.y * vv1.y));
     var lengthV2 = Math.sqrt((vv2.x * vv2.x) + (vv2.y * vv2.y));
-    console.log("filletRadius " + filletRadius)
     if (filletRadius < 0) {
 	filletRadius = Math.abs(filletRadius) * Math.min(lengthV1,lengthV2);
     }
@@ -1610,6 +1616,10 @@ function clearCorner (v1,v2,br) {
     var middleAngle = bisectVectors({x:-v1.x, y:-v1.y}, {x:v2.x, y:v2.y});
     var vv1 = extendPoint(v1); //Math.atan2(v1.y, v1.x);
     var vv2 = extendPoint(v2); //Math.atan2(v2.y, v2.x);
+    if (Math.abs(vv1.a - vv2.a) < utils.EPSILON) {
+	console.log("@@@@smaller");
+	return { x:vv1.x + vv2.x, y:vv1.y + vv2.y };
+    }
     var ma = Math.abs(vv1.a - vv2.a+Math.PI)/2;
     var secant = Math.abs(2 * bitRadius * Math.cos(ma));
     var cx = secant * Math.cos(vv1.a) + Math.cos(middleAngle) * bitRadius;
@@ -1628,6 +1638,11 @@ function clearCorner (v1,v2,br) {
             , cy : secant * Math.sin(vv1.a) + Math.sin(middleAngle) * bitRadius
 	}
     }
+    if (Math.abs(utils.hypotenuse(vv1, vv2) < utils.EPSILON)) {
+	console.log("@@@@smaller");
+	return { x:vv1.x + vv2.x, y:vv1.y + vv2.y };
+    }
+
     if (poly) {
         //   (2) /\(3)_____
         //   (1) \ 
