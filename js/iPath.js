@@ -22,7 +22,7 @@ var utils = function(){
   var _type = function( obj ) {
     return obj == null ?
       String( obj ) :
-      _class2type[ toString.call(obj) ] || "object";
+      _class2type[ Object.prototype.toString.call(obj) ] || "object";
   };
 
   var _isWindow = function( obj ) {
@@ -30,7 +30,7 @@ var utils = function(){
   };
 
   var _isFunction = function(target){
-    return toString.call(target) === "[object Function]";
+    return Object.prototype.toString.call(target) === "[object Function]";
   };
 
   var _isArray =  Array.isArray || function( obj ) {
