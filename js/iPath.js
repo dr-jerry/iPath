@@ -1093,6 +1093,7 @@ iPath.prototype.traverse = function(builder) {
 	    continue;
 	}
 	var element = utils.extend({ x: 0, y: 0 }, this.path[i]);
+	if (this.path[i+1].prefix === 'fillet' || 
 	var converter = this.cartesian2Cartesian;
 	if (element.prefix.indexOf('repeat') != -1) {
 	    if (element.prefix === 'repeat') {
@@ -1283,15 +1284,18 @@ iPath.prototype.pensEdge= function(distance, depth, numberOfPens, options) {
 	}, options || {});
     var ear = _routerEar(settings.bitRadius);
     var edgeBitRadius = settings.bitRadius * Math.sqrt(2);
+    console.log(1);
     for(var i=0;i<numberOfPens;i++) {
 	if (i>0) {
 	    this.concat(ear.rotate(5*Math.PI/4, ear))
 		.line({x:distance-2*edgeBitRadius}).concat(ear.rotate(7*Math.PI/4, ear))
 	}
+	console.log("for " + i);
 	this.line({y:depth-((i==0 && !settings.startWithEar) ? 0 : edgeBitRadius)});
 	if (settings.overshoot) {
 	    this.bezier(0, settings.overshoot * 0.3, distance * 0.1, settings.overshoot, distance * 0.5, settings.overshoot)
 		.bezier(distance * 0.4, 0, distance*0.5, settings.overshoot * -0.7, distance * 0.5, -1*settings.overshoot);
+	    console.log("for if " + i);
 	} else {
 	    this.line({x:distance});
 	}
@@ -1676,7 +1680,7 @@ function clearCorner (v1,v2,br) {
 */
 
 function arcPath(lines, fr, heading) {
-    result = [{v2:lines[0]}];
+    var result = [{v2:lines[0]}];
     if (heading == undefined) {
 	heading = 0;
     }
@@ -1700,8 +1704,6 @@ function arcPath(lines, fr, heading) {
 	} else if (result[x].arc) {
 	    iResult
 		.arc(result[x].arc);
-	    
-
 	}
     }
     iResult.line(result[result.length-1].v2);

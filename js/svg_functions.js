@@ -102,7 +102,7 @@ mirror = function mrr(wieberArray, axis) {
         for (var i=0;i<wieberArray.length;i++) {
             result[i] = [];
             for (var j=0;j<wieberArray[i].length;j++) {
-		result [i][j] = $.extend(true, {}, wieberArray[i][j]);
+		result [i][j] = utils.extend(true, {}, wieberArray[i][j]);
         	if (axis == 'x' && result[i][j].y) {
         	    result [i][j].y *= -1;
     		} else if (axis == 'y' && result[i][j].x) {

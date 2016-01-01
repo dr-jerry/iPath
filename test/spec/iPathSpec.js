@@ -14,13 +14,15 @@
  * specific language governing permissions and limitations under the License.
  */
 
+var uts = {trim : function (a) {
+    return a.trim()}}
 
 describe("iPath", function() {
   var _iPath;
   //jasmineFix removes trailing spaces and replace remaining spaces with dots. 
   // This prevents multiple space differences to be lost in html display.
   var jasmineFix = function(str) {
-      return $.trim(str).replace(/ /g, '.').replace(/\n/g,'\\n');
+      return uts.trim(str).replace(/ /g, '.').replace(/\n/g,'\\n');
   }
   // signify function to be called in a json string.
   var signy = function(key, val) {
@@ -224,7 +226,7 @@ describe("iPath", function() {
   });
   it ("should Move the pencil to 200, 200(0.5)", function() {
 	  var newPath = new iPath().Move({x:200,y:200}).move({x:420}).line(30,40);
-	  expect($.trim(newPath.dPath())).toEqual("M 620 200 l 30 40");
+	  expect(uts.trim(newPath.dPath())).toEqual("M 620 200 l 30 40");
       });
   it ("should not interfere with other iPath's instances(1)", function() {
 	  var newPath = new iPath().move({x:20,y:20}).move({x:420}).line(70,0);
@@ -303,21 +305,21 @@ describe("iPath", function() {
 	  //    \/ 
 
 
-	  expect("1:" + $.trim(_iPath.rotate(Math.PI/2, _iPath).dPath(3))).toEqual("1:m -2 2 l 2 2");
-	  expect("2:" + $.trim(_iPath.dPath(3))).toEqual("2:m 2 2 l 2 -2");	
-	  expect("3:" + $.trim(_iPath.rotate(Math.PI, _iPath).dPath(3))).toEqual("3:m -2 -2 l -2 2");
-	  expect("4:" + $.trim(_iPath.dPath(3))).toEqual("4:m 2 2 l 2 -2");
-	  expect("5:" + $.trim(_iPath.rotate(3*Math.PI/2, _iPath).dPath(3))).toEqual("5:m 2 -2 l -2 -2");
-	  expect("6:" + $.trim(_iPath.dPath(3))).toEqual("6:m 2 2 l 2 -2");
-	  expect("7:" + $.trim(_iPath.rotate(2*Math.PI, _iPath).dPath(3))).toEqual("7:m 2 2 l 2 -2");
-	  expect("8:" + $.trim(_iPath.dPath(3))).toEqual("8:m 2 2 l 2 -2");
-	  expect("9:" + $.trim(_iPath.rotate(1.5 * Math.PI/2, _iPath).dPath(3))).toEqual("9:m -2.828 0 l 0 2.828");
+	  expect("1:" + uts.trim(_iPath.rotate(Math.PI/2, _iPath).dPath(3))).toEqual("1:m -2 2 l 2 2");
+	  expect("2:" + uts.trim(_iPath.dPath(3))).toEqual("2:m 2 2 l 2 -2");	
+	  expect("3:" + uts.trim(_iPath.rotate(Math.PI, _iPath).dPath(3))).toEqual("3:m -2 -2 l -2 2");
+	  expect("4:" + uts.trim(_iPath.dPath(3))).toEqual("4:m 2 2 l 2 -2");
+	  expect("5:" + uts.trim(_iPath.rotate(3*Math.PI/2, _iPath).dPath(3))).toEqual("5:m 2 -2 l -2 -2");
+	  expect("6:" + uts.trim(_iPath.dPath(3))).toEqual("6:m 2 2 l 2 -2");
+	  expect("7:" + uts.trim(_iPath.rotate(2*Math.PI, _iPath).dPath(3))).toEqual("7:m 2 2 l 2 -2");
+	  expect("8:" + uts.trim(_iPath.dPath(3))).toEqual("8:m 2 2 l 2 -2");
+	  expect("9:" + uts.trim(_iPath.rotate(1.5 * Math.PI/2, _iPath).dPath(3))).toEqual("9:m -2.828 0 l 0 2.828");
 
 	  
-	  expect("10:" + $.trim(_iPath.dPath(3))).toEqual("10:m 2 2 l 2 -2");
+	  expect("10:" + uts.trim(_iPath.dPath(3))).toEqual("10:m 2 2 l 2 -2");
 	  var arrow = new iPath().line(100,0).line(0,-10).line(40,12);
     	  arrow.concat (arrow.reverse(arrow).reflect({x:1}));
-	  expect("11:" + $.trim(arrow.rotate(Math.PI).dPath(3))).toEqual("11:l -100 0 0 10 -40 -12 40 -12 0 10 100 0");
+	  expect("11:" + uts.trim(arrow.rotate(Math.PI).dPath(3))).toEqual("11:l -100 0 0 10 -40 -12 40 -12 0 10 100 0");
       });
   it ("tests for combined cartesian and polar lining", function() {
      var wieber = new iPath().line(2,2).line(2,-2).turtleLine({a : Math.PI/4, r :	2});
@@ -348,10 +350,10 @@ describe("iPath", function() {
       });
   it ("should test a reverse of a concattenation", function() {
 	  var trt = new iPath().line(20,30).bezier(20, 30, 180, 40,80,80).concat(new iPath().line(60,60));
-	  expect($.trim(new iPath().reverse(trt).dPath(4))).toEqual("l -60 -60 c 100 -40 -60 -50 -80 -80 l -20 -30");
-	  expect($.trim(trt.dPath(4))).toEqual("l 20 30 c 20 30 180 40 80 80 l 60 60");
+	  expect(uts.trim(new iPath().reverse(trt).dPath(4))).toEqual("l -60 -60 c 100 -40 -60 -50 -80 -80 l -20 -30");
+	  expect(uts.trim(trt.dPath(4))).toEqual("l 20 30 c 20 30 180 40 80 80 l 60 60");
 	  trt.reverse();
-	  expect($.trim(trt.dPath(4))).toEqual("l -60 -60 c 100 -40 -60 -50 -80 -80 l -20 -30");
+	  expect(uts.trim(trt.dPath(4))).toEqual("l -60 -60 c 100 -40 -60 -50 -80 -80 l -20 -30");
       });
 
   it ("converts a polar element to a cartesian element",function() {
@@ -366,28 +368,28 @@ describe("iPath", function() {
   });
   it ("tests a turtle bezier", function() {
       _iPath = new iPath().Move(400, 500).line(200, 0).turtleBezier({ a: 0, r: 200, cp1: { a:Math.PI/6, r:300 }, cp2: {a:-1*Math.PI/3, r:300} });
-      expect($.trim(_iPath.dPath(3))).toEqual("M 400 500 l 200 0 c 259.808 150 459.808 -150 200 0");
+      expect(uts.trim(_iPath.dPath(3))).toEqual("M 400 500 l 200 0 c 259.808 150 459.808 -150 200 0");
   });
 
   
   it ("tests a turtle line",function() {
       _iPath.line(20, 0).turtleLine({a: Math.PI/4, r: 20});
-      expect($.trim(_iPath.dPath(3))).toEqual("l 20 0 14.142 14.142");
+      expect(uts.trim(_iPath.dPath(3))).toEqual("l 20 0 14.142 14.142");
       _iPath = (new iPath()).line(20, 0).turtleLine({a: Math.PI/4, r: 20}).line(20, 0).turtleLine({a: Math.PI/4, r: 20});
-      expect($.trim(_iPath.dPath(3))).toEqual("l 20 0 14.142 14.142 20 0 14.142 14.142");
+      expect(uts.trim(_iPath.dPath(3))).toEqual("l 20 0 14.142 14.142 20 0 14.142 14.142");
   });
 
   it ("tests a turtle move", function() {
       _iPath = (new iPath()).line(20, 0).turtleMove({a: Math.PI/4, r: 20}).line(20, 0).turtleMove({a: Math.PI/4, r: 20});
-      expect($.trim(_iPath.dPath(3))).toEqual("l 20 0 m 14.142 14.142 l 20 0");
+      expect(uts.trim(_iPath.dPath(3))).toEqual("l 20 0 m 14.142 14.142 l 20 0");
   });
   it ("tests a skew", function() {
 	  _iPath = new iPath().line(500,60).line(500,-60);
-	  expect($.trim(_iPath.skew(0.5, 0).dPath(3))).toEqual("l 470 60 530 -60");
+	  expect(uts.trim(_iPath.skew(0.5, 0).dPath(3))).toEqual("l 470 60 530 -60");
   });
   it ("tests a turtle bezier", function() {
       _iPath = new iPath().Move(400, 500).line(200, 0).turtleBezier({ a: 0, r: 200, cp1: { a:Math.PI/6, r:300 }, cp2: {a:-1*Math.PI/3, r:300} });
-      expect($.trim(_iPath.dPath(3))).toEqual("M 400 500 l 200 0 c 259.808 150 459.808 -150 200 0");
+      expect(uts.trim(_iPath.dPath(3))).toEqual("M 400 500 l 200 0 c 259.808 150 459.808 -150 200 0");
   });
   it ("tests the pensedge reflect", function() {
 	  expect(jasmineFix(new iPath().pensEdge(87/5,18.6,2,{overshoot: 18, penSizeInPlankSize: false}).reflect({y:1}).dPath(3)))
@@ -403,22 +405,22 @@ describe("iPath", function() {
 
   it ("tests for a self reflect", function() {
       var heart = new iPath().bezier(0, -50, -150, -200, 0, -120);
-      expect($.trim(heart.reflect({y:1}).dPath(3))).toEqual("c 0 -50 150 -200 0 -120");
+      expect(uts.trim(heart.reflect({y:1}).dPath(3))).toEqual("c 0 -50 150 -200 0 -120");
   });
   if ("tests for a turtle bezier and line", function() {
 	  var bezier = new iPath().line(0,-200).turtleBezier({a:0, r:200, cp1:{a:-Math.PI/6,r:80}, cp2: {a:Math.PI/6,r:80}});
   });
   it ("tests a squarehole", function() {
-	  expect($.trim(squareHole(10,5)).replace(/(?!^) l/g, '').indexOf($.trim(new iPath().squareHole(10,5).dPath(3)))).toBeGreaterThan(-1);
-	  expect($.trim(StretchSketch.load({jsvg: '#{squareHole(10,5, {bitRadius: 5\\})}'}).evalJSVG()).replace(/l/, 'b').replace(/ l/g, '').replace(/b/, 'l')
-		 .indexOf($.trim(new iPath().squareHole(10,5, {bitRadius: 5}).dPath(3)))).toBeGreaterThan(-1);
+	  expect(uts.trim(squareHole(10,5)).replace(/(?!^) l/g, '').indexOf(uts.trim(new iPath().squareHole(10,5).dPath(3)))).toBeGreaterThan(-1);
+	  expect(uts.trim(StretchSketch.load({jsvg: '#{squareHole(10,5, {bitRadius: 5\\})}'}).evalJSVG()).replace(/l/, 'b').replace(/ l/g, '').replace(/b/, 'l')
+		 .indexOf(uts.trim(new iPath().squareHole(10,5, {bitRadius: 5}).dPath(3)))).toBeGreaterThan(-1);
   });
 
   it ("rectBezier", function() {
-	  expect($.trim(new iPath().rectBezier({x: 50, y:80}).dPath(3))).toEqual("c 0 80 0 80 25 80 25 0 25 0 25 -80");
-	  expect($.trim(new iPath().rectBezier({x: 50, y:80}, {xFact : 0.5, yFact:2}).dPath(3))).toEqual("c 0 160 12.5 80 25 80 12.5 0 25 80 25 -80");
-	  expect($.trim(new iPath().rectBezier({x: 50, y:80}, {xFact : 0.5, yFact:2}).dPath(3))).toEqual("c 0 160 12.5 80 25 80 12.5 0 25 80 25 -80");
-	  expect($.trim(new iPath().rectBezier({x: 50, y:80}, {xFact : 0.5, yFact:2, angle: Math.PI/3}).dPath(3))).toEqual("c -138.564 80 -63.032 50.825 -56.782 61.651 6.25 10.825 -56.782 61.651 81.782 -18.349");
+	  expect(uts.trim(new iPath().rectBezier({x: 50, y:80}).dPath(3))).toEqual("c 0 80 0 80 25 80 25 0 25 0 25 -80");
+	  expect(uts.trim(new iPath().rectBezier({x: 50, y:80}, {xFact : 0.5, yFact:2}).dPath(3))).toEqual("c 0 160 12.5 80 25 80 12.5 0 25 80 25 -80");
+	  expect(uts.trim(new iPath().rectBezier({x: 50, y:80}, {xFact : 0.5, yFact:2}).dPath(3))).toEqual("c 0 160 12.5 80 25 80 12.5 0 25 80 25 -80");
+	  expect(uts.trim(new iPath().rectBezier({x: 50, y:80}, {xFact : 0.5, yFact:2, angle: Math.PI/3}).dPath(3))).toEqual("c -138.564 80 -63.032 50.825 -56.782 61.651 6.25 10.825 -56.782 61.651 81.782 -18.349");
   });
   it ("tests the dxf functionality", function() {
 	  var polygon = {};
@@ -533,6 +535,6 @@ describe("iPath", function() {
     });
 //   it ("it tests a turtle bezier",function() {
 // 	  _iPath = (new iPath()).line(20, 0).turtleBezier({ a: Math.PI/4, r: 20, cp1: { a:-1*Math.PI/4, r:30 }, cp2: {a:0, r:30}})
-// 	      expect($.trim(_iPath.dPath(3))).toEqual("l 20 0 c 21 -21 42 0 21 21");
+// 	      expect(uts.trim(_iPath.dPath(3))).toEqual("l 20 0 c 21 -21 42 0 21 21");
 //   });
 });
