@@ -214,7 +214,9 @@ Number.prototype.between = function (min, max) {
 
 
  // 
-iPath = function () { this.path = []; this.location={x:0,y:0}; this.heading=0; this.labels={};};
+iPath = function () {
+    this.path = []; this.location={x:0,y:0}; this.heading=0; this.labels={};this.lineCache = {};
+};
  iPath.prototype.type = 'iPath';
  iPath.cs = "CS"; //coordinate system
  iPath.cartesian = "cartesian";
@@ -225,7 +227,6 @@ iPath = function () { this.path = []; this.location={x:0,y:0}; this.heading=0; t
  iPath.settings = {};
  iPath.bezierTolerance = 0.11;
  iPath.prototype.utilFunctions = {};
-
  
  addMethod(iPath.prototype, 'travel', function( pt, prefix) {
      if (typeof pt === "object") {
@@ -573,13 +574,14 @@ iPath.prototype.reverse= function(arg) {
 		       y : sc * pt.y};
             }
 	}
-	var args = $.makeArray(arguments)
+	var args = Array.prototype.slice.call(arguments)
 	,partialFn = skale.curry(args.shift());
 	args.unshift(partialFn);
 	return this.iterate.apply(this, args);
     }
 
-    iPath.prototype.rotate= function() {
+iPath.prototype.rotate= function() {
+    console.log('rotate 1');
 	var rotatePoint = function(pt, angle) {
 	    return {x : (pt.x * Math.cos(angle) - pt.y* Math.sin(angle))
 			, y : (pt.x * Math.sin(angle) + pt.y* Math.cos(angle)) }
@@ -611,9 +613,9 @@ iPath.prototype.reverse= function(arg) {
 		return result;
 	    } 
 	}
-	var args = $.makeArray(arguments)
-	,partialFn = rotateElement.curry(args.shift());
-	args.unshift(partialFn);
+    var args = Array.prototype.slice.call(arguments)
+    ,partialFn = rotateElement.curry(args.shift());
+    args.unshift(partialFn);
 	return this.iterate.apply(this, args);
     }
 
@@ -1093,7 +1095,7 @@ iPath.prototype.traverse = function(builder) {
 	    continue;
 	}
 	var element = utils.extend({ x: 0, y: 0 }, this.path[i]);
-	if (this.path[i+1].prefix === 'fillet' || 
+	
 	var converter = this.cartesian2Cartesian;
 	if (element.prefix.indexOf('repeat') != -1) {
 	    if (element.prefix === 'repeat') {
@@ -1284,18 +1286,15 @@ iPath.prototype.pensEdge= function(distance, depth, numberOfPens, options) {
 	}, options || {});
     var ear = _routerEar(settings.bitRadius);
     var edgeBitRadius = settings.bitRadius * Math.sqrt(2);
-    console.log(1);
     for(var i=0;i<numberOfPens;i++) {
 	if (i>0) {
 	    this.concat(ear.rotate(5*Math.PI/4, ear))
 		.line({x:distance-2*edgeBitRadius}).concat(ear.rotate(7*Math.PI/4, ear))
 	}
-	console.log("for " + i);
 	this.line({y:depth-((i==0 && !settings.startWithEar) ? 0 : edgeBitRadius)});
 	if (settings.overshoot) {
 	    this.bezier(0, settings.overshoot * 0.3, distance * 0.1, settings.overshoot, distance * 0.5, settings.overshoot)
 		.bezier(distance * 0.4, 0, distance*0.5, settings.overshoot * -0.7, distance * 0.5, -1*settings.overshoot);
-	    console.log("for if " + i);
 	} else {
 	    this.line({x:distance});
 	}
@@ -1324,6 +1323,7 @@ iPath.prototype.pensEdge= function(distance, depth, numberOfPens, options) {
  */
 
 iPath.prototype.squareHole= function(h, b, options) {
+    console.log('sh 1');
     function routerEar(bitRadius) {
 	if (!bitRadius) {
 	    return new iPath();
@@ -1352,6 +1352,7 @@ iPath.prototype.squareHole= function(h, b, options) {
     }
     result.move(2*(b+settings.widthCorrection), 0);
     this.concat(result);
+    console.log('sh end');
     return this;
 }
 
