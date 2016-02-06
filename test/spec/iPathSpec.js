@@ -34,6 +34,15 @@ describe("iPath", function() {
   beforeEach(function() {
 	  _iPath = new iPath();
   });
+
+    it ("test the nextAkin fcy", function() {
+	var pth = new iPath().line(10,0).line(20,20).line(30,30);
+	expect (JSON.stringify(pth.nextAkin(-1))).toEqual('{"x":30,"y":30,"prefix":"l"}');
+    });
+    if ("tests the void fillet", function() {
+	var pth = new iPath().line(10,0).fillet(4).line(0,20);
+	expect (JSON.stringify(pth.dPath(3))).toEqual("l 10 0 0 20");
+    });
   it("tests a polar rotate", function() {
       var ear = new iPath().turtleLine({a:0, r:30}).turtleLine({a:Math.PI/2, r:30}).turtleLine({a:Math.PI/2,r:30});
       expect(jasmineFix(ear.dPath(3))).toEqual("l.30.0.0.30.-30.0");
