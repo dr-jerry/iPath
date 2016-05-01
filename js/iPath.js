@@ -13,7 +13,9 @@
  * KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
  */
-
+Array.prototype.peek = function() {
+    return this[this.length-1];
+}
 var utils = function(){
   "use strict";
 
@@ -128,6 +130,11 @@ var utils = function(){
     return target;
   };
 
+    var _hypotenuse = function(v) {
+	v = _extend({x:0,y:0}, v);
+	return Math.sqrt((v.x * v.x) + (v.y * v.y));
+    }
+
   return {
       class2type: _class2type,
       type: _type,
@@ -140,8 +147,12 @@ var utils = function(){
 	  return (v1.x*v2.y) + (v1.y*v2.x)
       }
       , EPSILON : parseFloat("1e-10")
-      , hypotenuse : function(v) {
-	  return Math.sqrt((v.x * v.x) + (v.y * v.y));
+      , hypotenuse : _hypotenuse
+      , diag : _hypotenuse
+      , normalized: function(v) {
+	  var d = _hypotenuse(v);
+	  v = _extend({x:0, y:0}, v);
+	  return {x:v.x/d, y:v.y/d}
       }
   }
 }();
@@ -246,7 +257,7 @@ iPath = function () {
        if (!isNumber(x) || !isNumber(y)) {
 	   throw { name: "Invalid number", level: "critical"} ;
        }
-       this.path.push(utils.extend(true, {x: 0, y:0}, {x: x
+     this.path.push(utils.extend(true, {x: 0, y:0}, {x: x
 		       , y: y
 		       , prefix: prefix}));
        return this;
@@ -495,7 +506,7 @@ iPath.prototype.reverse= function(arg) {
 	}
     }
 
- 
+    
     iPath.prototype.reflect= function() {
 	var args = Array.prototype.slice.call(arguments);
 	var reflectionVector  = utils.extend(true, {x:0, y:0}, args.shift());
@@ -538,6 +549,7 @@ iPath.prototype.reverse= function(arg) {
 	args.unshift(partialFn);
 	return this.iterate.apply(this, args);
     }
+
     iPath.prototype.mirror=iPath.prototype.reflect;
 
     iPath.prototype.skew= function() {
@@ -1565,10 +1577,13 @@ function crossProduct (v1, v2) {
 
 function extendPoint(v1) {
     var result = {};
-    if (v1.x == undefined && v1.y == undefined && v1.a !== undefined && v1.r !== undefined) {
-	utils.extend(result, {x : Math.cos(v1.a) * v1.r, y : Math.sin(v1.a) * v1.r}, v1);
-    } else if (v1.x !== undefined && v1.y !== undefined && v1.a == undefined && v1.r == undefined) {
-	utils.extend(result, {a : Math.atan2(v1.y, v1.x), r: Math.sqrt((v1.x * v1.x) + (v1.y * v1.y))}, v1);
+    if (v1.x !== undefined && v1.y !== undefined && v1.a !== undefined && v1.r !== undefined) {
+	// the point has been extended already return argument.
+	if (v1.x == undefined && v1.y == undefined && (v1.a !== undefined || v1.r !== undefined)) {
+	    utils.extend(result, {x : Math.cos(v1.a || 0) * (v1.r || 0), y : Math.sin(v1.a || 0) * (v1.r || 0)}, v1);
+	} else if ((v1.x !== undefined || v1.y !== undefined) && v1.a == undefined && v1.r == undefined) {
+	    utils.extend(result, {a : Math.atan2(v1.y || 0, v1.x || 0), r: utils.diag(v1)}, v1);
+	}
     }
     return result;
 }
@@ -1676,11 +1691,41 @@ function clearCorner (v1,v2,br) {
     return result;
 };
 
+
 /*
- if br = negative, the t-bone fillet is a 3 line extension instead of an arc. (The bit radius remains the same.
+returns a new array lines with the original lines, appended with original lines, reversed and mirrored in vector)
 */
 
-function arcPath(lines, fr, heading) {
+
+function reflectPath(lines, vector) {
+    var isArc = function(v) { return  v.br || v.fr; }
+    var result = utils.extend(true, [], lines);
+    var n = utils.normalize(vector)
+    length = lines.length- (isArc(lines.peek()) ? 1 : 2);
+    for (var x=length; x>=0; x--) {
+	if (isArc(lines[x])) {
+	    result.push(lines[x])
+	} else {
+	    var d = dot(lines[x],n);
+	    result.push ({
+		x:lines[x].x -2 * d * n.y
+		, y:lines[x].y -2 * d * n.x
+	    })
+	}
+    }
+    return result;
+}
+	
+
+	    
+	    
+	    /*
+	      if br = negative, the t-bone fillet is a 3 line extension instead of an arc. (The bit radius remains the same.
+	      fr is default filletradius.
+
+	    */
+
+	    function arcPath(lines, fr, heading) {
     var result = [{v2:lines[0]}];
     if (heading == undefined) {
 	heading = 0;
