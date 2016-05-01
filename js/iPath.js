@@ -152,7 +152,7 @@ var utils = function(){
       , normalize: function(v) {
 	  var d = _hypotenuse(v);
 	  v = _extend({x:0, y:0}, v);
-	  return {x:v.x/d, y:v.y/d}
+	  return {x:v.y/d, y:v.x/d}
       }
   }
 }();
@@ -1718,22 +1718,23 @@ function reflectPath(lines, vector) {
 
 	    */
 
-	    function arcPath(lines, fr, heading) {
+function arcPath(lines, fr, heading) {
     var result = [{v2:lines[0]}];
     if (heading == undefined) {
 	heading = 0;
     }
+    var count=1
     for (var x=1; x<lines.length; x++) {
         if (lines[x].br) {
-	    result[x] = clearCorner(result[x-1].v2, lines[x], lines[x].br);
+	    result[count] = clearCorner(result[count-1].v2, lines[x+1], lines[x].br);
 	} else if (lines[x].fr || fr != undefined && lines[x].fr != 0) {
-            result[x] = doCorner(result[x-1].v2, lines[x], lines[x].fr || fr);
+            result[count] = doCorner(result[count-1].v2, lines[x+1], lines[x].fr || fr);
 	} else {
-	    result[x] = {v1: result[x-1].v2, v2:lines[x]};
+	    result[++count] = {v1: result[count-2].v2, v2:lines[x]};
 	}
     }
     var iResult = new iPath();
-    for (var x=1; x<result.length; x++) {
+    for (var x=1; x<result.length-1; x++) {
         iResult.line(result[x].v1);
 	if (result[x].poly) {
 	    iResult
@@ -1745,7 +1746,7 @@ function reflectPath(lines, vector) {
 		.arc(result[x].arc);
 	}
     }
-    iResult.line(result[result.length-1].v2);
+    iResult.line(result[result.length-2].v2);
     return iResult;
 }
 
