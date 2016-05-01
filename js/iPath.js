@@ -1578,13 +1578,13 @@ function crossProduct (v1, v2) {
 function extendPoint(v1) {
     var result = {};
     if (v1.x !== undefined && v1.y !== undefined && v1.a !== undefined && v1.r !== undefined) {
-	// the point has been extended already return argument.
+	return v1;	// the point has been extended already return argument.
+    } else 
 	if (v1.x == undefined && v1.y == undefined && (v1.a !== undefined || v1.r !== undefined)) {
 	    utils.extend(result, {x : Math.cos(v1.a || 0) * (v1.r || 0), y : Math.sin(v1.a || 0) * (v1.r || 0)}, v1);
 	} else if ((v1.x !== undefined || v1.y !== undefined) && v1.a == undefined && v1.r == undefined) {
 	    utils.extend(result, {a : Math.atan2(v1.y || 0, v1.x || 0), r: utils.diag(v1)}, v1);
 	}
-    }
     return result;
 }
 
