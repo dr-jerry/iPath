@@ -35,6 +35,9 @@ describe("iPath", function() {
 	  _iPath = new iPath();
   });
 
+    it ("tests the extendPoint", function(){
+	expect (JSON.stringify(extendPoint({x:30,y:30}))).toEqual('{"a":0.7853981633974483,"r":42.42640687119285,"x":30,"y":30}');
+    });
     it ("test the nextAkin fcy", function() {
 	var pth = new iPath().line(10,0).line(20,20).line(30,30);
 	expect (JSON.stringify(pth.nextAkin(-1))).toEqual('{"x":30,"y":30,"prefix":"l"}');
