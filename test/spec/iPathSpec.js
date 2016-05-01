@@ -34,7 +34,12 @@ describe("iPath", function() {
   beforeEach(function() {
 	  _iPath = new iPath();
   });
-
+    it ("tests the reflectPath", function() {
+	var tc = { gutter : 3, boneLength: 5, width: 24, length: 52};
+	var p1 = [{x:3, y:0}, {x:3, y:3}, {x:0, y:3}, {x:6-tc.gutter, y:2}, {x:0, y: tc.boneLength-8}, {x:(tc.width-tc.gutter)/2, y:0}, {x:0, y:-tc.length}];
+	var pr = reflectPath(p1,{x:1,y:1});
+	expect (jasmineFix(arcPath(pr).dPath(3))).toEqual("l 10 10");
+    });
     it ("tests the extendPoint", function(){
 	expect (JSON.stringify(extendPoint({x:30,y:30}))).toEqual('{"a":0.7853981633974483,"r":42.42640687119285,"x":30,"y":30}');
     });

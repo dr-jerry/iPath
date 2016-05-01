@@ -149,7 +149,7 @@ var utils = function(){
       , EPSILON : parseFloat("1e-10")
       , hypotenuse : _hypotenuse
       , diag : _hypotenuse
-      , normalized: function(v) {
+      , normalize: function(v) {
 	  var d = _hypotenuse(v);
 	  v = _extend({x:0, y:0}, v);
 	  return {x:v.x/d, y:v.y/d}
@@ -1701,23 +1701,16 @@ function reflectPath(lines, vector) {
     var isArc = function(v) { return  v.br || v.fr; }
     var result = utils.extend(true, [], lines);
     var n = utils.normalize(vector)
-    length = lines.length- (isArc(lines.peek()) ? 1 : 2);
+    var length = lines.length- (isArc(lines.peek()) ? 2 : 1);
     for (var x=length; x>=0; x--) {
-	if (isArc(lines[x])) {
-	    result.push(lines[x])
-	} else {
-	    var d = dot(lines[x],n);
-	    result.push ({
-		x:lines[x].x -2 * d * n.y
-		, y:lines[x].y -2 * d * n.x
-	    })
-	}
+	var d = utils.dot(lines[x],n);
+	result.push ({
+	    x:lines[x].x -2 * d * n.y
+	    , y:lines[x].y -2 * d * n.x
+	})
     }
     return result;
 }
-	
-
-	    
 	    
 	    /*
 	      if br = negative, the t-bone fillet is a 3 line extension instead of an arc. (The bit radius remains the same.
