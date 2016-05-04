@@ -1600,6 +1600,7 @@ function extendPoint(v1) {
 // result is 2 adjusted vectors and the arc object {v1: {x:.. , y:.. }, v2: {x:.., y:..}, arc: {cx:.., cy:.., r:.., x:.., y:..}}
 // cx and cy is the centerpoint of the arc.
 function doCorner (v1,v2,filletRadius) {
+    if (filletRadius === 0) return {v1: v1, v2: v2};
     var middleAngle = bisectVectors({x:-v1.x, y:-v1.y}, {x:v2.x, y:v2.y});
     var vv1 = extendPoint(v1); //Math.atan2(v1.y, v1.x);
     var vv2 = extendPoint(v2); //Math.atan2(v2.y, v2.x);
@@ -1631,6 +1632,7 @@ function doCorner (v1,v2,filletRadius) {
 
 // Makes a corner large enough for given bitRadius
 function clearCorner (v1,v2,br) {
+    if (br == 0) return {v1: v1, v2: v2}
     var poly = br < 0;
     var bitRadius = Math.abs(br);
     var middleAngle = bisectVectors({x:-v1.x, y:-v1.y}, {x:v2.x, y:v2.y});
@@ -1703,11 +1705,15 @@ function reflectPath(lines, vector) {
     var n = utils.normalize(vector)
     var length = lines.length- (isArc(lines.peek()) ? 2 : 1);
     for (var x=length; x>=0; x--) {
-	var d = utils.dot(lines[x],n);
-	result.push ({
-	    x:lines[x].x -2 * d * n.y
-	    , y:lines[x].y -2 * d * n.x
-	})
+	if(lines[x].br || lines[x].fr) {
+	    result.push(lines[x])
+	} else {
+	    var d = utils.dot(lines[x],n);
+	    result.push ({
+		x:lines[x].x -2 * d * n.y
+		, y:lines[x].y -2 * d * n.x
+	    })
+	}
     }
     return result;
 }
@@ -1718,25 +1724,35 @@ function reflectPath(lines, vector) {
 
 	    */
 
-function arcPath(lines, fr, heading) {
-    var result = [{v2:lines[0]}];
-    if (heading == undefined) {
-	heading = 0;
-    }
-    var count=1
-    for (var x=1; x<lines.length; x++) {
+function arcPath(lines) {
+    var result = [];
+    for (var x=0; x<lines.length; x++) {
+	var subResult = undefined;
         if (lines[x].br) {
-	    result[count] = clearCorner(result[count-1].v2, lines[x+1], lines[x].br);
-	} else if (lines[x].fr || fr != undefined && lines[x].fr != 0) {
-            result[count] = doCorner(result[count-1].v2, lines[x+1], lines[x].fr || fr);
+	    subResult = clearCorner(result[x-1].v, lines[x+1], lines[x].br);
+	} else if (lines[x].fr) {
+            subResult = doCorner(result[x-1].v, lines[x+1], lines[x].fr || fr);
+	}
+	if (subResult) {
+	    result[x-1].v = subResult.v1
+	    result[x+1] = {v: subResult.v2}
+	    if (subResult.arc) {
+		result[x] = {arc: subResult.arc}
+	    }
+	    if (subResult.poly) {
+		result[x] = {poly: subResult.poly}
+	    }
 	} else {
-	    result[++count] = {v1: result[count-2].v2, v2:lines[x]};
+	    if (result.length == x) {
+		result[x] = {v: lines[x]}
+	    }
 	}
     }
     var iResult = new iPath();
-    for (var x=1; x<result.length-1; x++) {
-        iResult.line(result[x].v1);
-	if (result[x].poly) {
+    for (var x=0; x<=result.length-1; x++) {
+        if (result[x].v !== undefined) {
+	    iResult.line(result[x].v);
+	} else 	if (result[x].poly) {
 	    iResult
 		.line(result[x].poly.l1.x,result[x].poly.l1.y)
 		.line(result[x].poly.l2.x,result[x].poly.l2.y)
@@ -1746,7 +1762,6 @@ function arcPath(lines, fr, heading) {
 		.arc(result[x].arc);
 	}
     }
-    iResult.line(result[result.length-2].v2);
     return iResult;
 }
 
