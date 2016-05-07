@@ -143,6 +143,8 @@ var utils = function(){
       isArray: _isArray,
       isPlainObject: _isPlainObject,
       extend: _extend
+      , isArc : function(v) { return  v.br || v.fr; }
+      , isLine : function(v) { return v.x || v.y || v.a || v.r; }
       , dot : function (v1,v2){
 	  return (v1.x*v2.y) + (v1.y*v2.x)
       }
@@ -1700,10 +1702,9 @@ returns a new array lines with the original lines, appended with original lines,
 
 
 function reflectPath(lines, vector) {
-    var isArc = function(v) { return  v.br || v.fr; }
     var result = utils.extend(true, [], lines);
     var n = utils.normalize(vector)
-    var length = lines.length- (isArc(lines.peek()) ? 2 : 1);
+    var length = lines.length- (utils.isArc(lines.peek()) ? 2 : 1);
     for (var x=length; x>=0; x--) {
 	if(lines[x].br || lines[x].fr) {
 	    result.push(lines[x])
@@ -1724,29 +1725,36 @@ function reflectPath(lines, vector) {
 
 	    */
 
-function arcPath(lines) {
+function arcPath(lines, filletRadius) {
+    var fillet = (filletRadius !== undefined ? {fr: filletRadius} : {fr:false});
     var result = [];
+    var count = 0;
     for (var x=0; x<lines.length; x++) {
 	var subResult = undefined;
+	var extraCount = 0;
         if (lines[x].br) {
-	    subResult = clearCorner(result[x-1].v, lines[x+1], lines[x].br);
+	    subResult = clearCorner(result[count-1].v, lines[x+1], lines[x].br);
 	} else if (lines[x].fr) {
-            subResult = doCorner(result[x-1].v, lines[x+1], lines[x].fr || fr);
+            subResult = doCorner(result[count-1].v, lines[x+1], lines[x].fr);
+	} else if (fillet.fr && x>0 && utils.isLine(lines[x]) && utils.isLine(lines[x-1])) {
+	    subResult = doCorner(result[count-1].v, lines[x], fillet.fr);
+	    extraCount = 1;
 	}
 	if (subResult) {
-	    result[x-1].v = subResult.v1
-	    result[x+1] = {v: subResult.v2}
+	    result[count-1].v = subResult.v1;
+	    result[count+1] = {v: subResult.v2};
 	    if (subResult.arc) {
-		result[x] = {arc: subResult.arc}
+		result[count] = {arc: subResult.arc}
 	    }
 	    if (subResult.poly) {
-		result[x] = {poly: subResult.poly}
+		result[count] = {poly: subResult.poly}
 	    }
 	} else {
-	    if (result.length == x) {
-		result[x] = {v: lines[x]}
+	    if (result[count] === undefined) {
+		result[count] = {v: lines[x]}
 	    }
 	}
+	count = count + 1 + extraCount;
     }
     var iResult = new iPath();
     for (var x=0; x<=result.length-1; x++) {
