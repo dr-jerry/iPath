@@ -1497,20 +1497,36 @@ function arcPath(lines, filletRadius) {
     var fillet = (filletRadius !== undefined ? {fr: filletRadius} : {fr:false});
     var result = [];
     var count = 0;
+    var last = false;
     for (var x=0; x<lines.length; x++) {
 	var subResult = undefined;
 	var extraCount = 0;
+	last = (x == lines.length-1);
         if (lines[x].br) {
-	    subResult = clearCorner(result[count-1].v, lines[x+1], lines[x].br);
+	    if (!last) {
+		subResult = clearCorner(result[count-1].v, lines[x+1], lines[x].br);
+	    } else {
+		subResult = clearCorner(result[count-1].v, result[0].v, lines[x].br);
+	    }
 	} else if (lines[x].fr) {
-            subResult = doCorner(result[count-1].v, lines[x+1], lines[x].fr);
+	    if (!last) {
+		subResult = doCorner(result[count-1].v, lines[x+1], lines[x].fr);
+	    } else {
+		subResult = doCorner(result[count-1].v, result[0].v, lines[x].fr);
+	    }
 	} else if (fillet.fr && x>0 && utils.isLine(lines[x]) && utils.isLine(lines[x-1])) {
 	    subResult = doCorner(result[count-1].v, lines[x], fillet.fr);
+	    // if you want the last item to be a fillet you have to specify it manually
+	    // :-(
 	    extraCount = 1;
 	}
 	if (subResult) {
 	    result[count-1].v = subResult.v1;
-	    result[count+1] = {v: subResult.v2};
+	    if (!last) {
+		result[count+1] = {v: subResult.v2};
+	    } else {
+		result[0].v = subResult.v2;
+	    }
 	    if (subResult.arc) {
 		result[count] = {arc: subResult.arc}
 	    }
