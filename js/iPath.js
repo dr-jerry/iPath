@@ -1498,6 +1498,7 @@ function arcPath(lines, filletRadius) {
     var result = [];
     var count = 0;
     var last = false;
+    	console.log("arcpath 1");
     for (var x=0; x<lines.length; x++) {
 	var subResult = undefined;
 	var extraCount = 0;
@@ -1520,6 +1521,7 @@ function arcPath(lines, filletRadius) {
 	    // :-(
 	    extraCount = 1;
 	}
+	console.log("arcpath 2");
 	if (subResult) {
 	    result[count-1].v = subResult.v1;
 	    if (!last) {
@@ -1534,12 +1536,14 @@ function arcPath(lines, filletRadius) {
 		result[count] = {poly: subResult.poly}
 	    }
 	} else {
-	    if (result[count] === undefined) {
+	    if (result[count] === undefined  && utils.isLine(lines[x])) {
 		result[count] = {v: lines[x]}
-	    }
+		
+	    } else if (!utils.isLine(lines[x])) extraCount = -1;
 	}
 	count = count + 1 + extraCount;
     }
+    console.log("arcpath 3 " + JSON.stringify(result));
     var iResult = new iPath();
     for (var x=0; x<=result.length-1; x++) {
         if (result[x].v !== undefined) {
@@ -1556,6 +1560,3 @@ function arcPath(lines, filletRadius) {
     }
     return iResult;
 }
-
-
-

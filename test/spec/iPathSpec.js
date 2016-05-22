@@ -34,6 +34,26 @@ describe("iPath", function() {
   beforeEach(function() {
 	  _iPath = new iPath();
   });
+    it ("test gear error", function() {
+	gear = {n: 3, r: 150, h: 20, arcrad: 0};
+	gear.ribbon = gear.r * Math.sin(Math.PI/gear.n) * 2 ;
+	gear.toothAngle = Math.atan(2* gear.h, gear.ribbon);
+	gear.toothSide = gear.ribbon / (2*Math.cos(gear.toothAngle));
+	gear.iPath = new iPath().turtleLine({a: (2*Math.PI / gear.n) - gear.toothAngle, r: gear.toothSide})
+	    .turtleLine({a: 2*gear.toothAngle, r: gear.toothSide}).turtleLine({a:-gear.toothAngle})
+	    .repeat(gear.n);
+	gear.l = gear.iPath.dPath(7).substring(3).split(/ +/).map(Number);
+	gear.l2 = [];
+	for (var i = 0;i < gear.l.length;i += 2) {
+	    console.log("i is " + i);
+	    gear.l2.push ({x:gear.l[i], y:gear.l[i+1]});
+	    gear.l2.push({fr:gear.arcrad});
+	}
+	gear.l3= arcPath(gear.l2);
+	console.log("l3 is " + JSON.stringify(gear.l3));
+	console.log("l3 is " + gear.l3.dPath());
+	expect (jasmineFix(arcPath(gear.l2).dPath(3))).toEqual('l.96.464.96.464.a.5.5.0.0.0.7.071.0..l.96.464.-96.464.20.30');
+    });
     it ("tests a very simple arcPath", function() {
 	var t1 = [{x:100,y:100},{fr:5},{x:100,y:-100},{x:20,y:30}];
 //	arcPath(t1);
@@ -49,7 +69,7 @@ describe("iPath", function() {
 	var tc = { gutter : 3, boneLength: 5, width: 24, length: 52};
 	var p1 = [{x:3, y:0}, {x:3, y:3}, {x:0, y:3}, {x:6-tc.gutter, y:2}, {x:0, y: tc.boneLength-8}, {x:(tc.width-tc.gutter)/2, y:0}, {x:0, y:-tc.length}];
 	var pr = reflectPath(p1,{x:1,y:1});
-	expect (jasmineFix(arcPath(pr).dPath(3))).toEqual("l 10 10");
+	expect (jasmineFix(arcPath(pr).dPath(3))).toEqual("l.3.0.3.3.0.3.3.2.0.-3.10.5.0.0.-52.52.0.0.-10.5.3.0.-2.-3.-3.0.-3.-3.0.-3");
     });
     it ("tests the extendPoint", function(){
 	expect (JSON.stringify(extendPoint({x:30,y:30}))).toEqual('{"a":0.7853981633974483,"r":42.42640687119285,"x":30,"y":30}');
