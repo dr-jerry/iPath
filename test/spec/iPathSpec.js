@@ -34,6 +34,11 @@ describe("iPath", function() {
   beforeEach(function() {
 	  _iPath = new iPath();
   });
+      it ("should display a proper curve(5)", function() {
+	  _iPath.bezier({x: 50, y: 50, cp1: {x: 50}, cp2:{y:50}});
+	  expect(_iPath.dPath({x:50, y: 50})).toEqual("M 50 50  c 50 0 0 50 50 50");
+      });
+
     it ("test gear error", function() {
 	gear = {n: 3, r: 150, h: 20, arcrad: 0};
 	gear.ribbon = gear.r * Math.sin(Math.PI/gear.n) * 2 ;
@@ -297,10 +302,6 @@ describe("iPath", function() {
 	      _iPath.bezier(20, 30, 20);
       }).toThrow("illegal number of arguments 3 for bezier function");
     });
-  it ("should display a proper curve(5)", function() {
-	  _iPath.bezier({x: 50, y: 50, cp1: {x: 50}, cp2:{y:50}});
-	  expect(_iPath.dPath()).toEqual(" c 50 0 0 50 50 50");
-      });
   it ("should check whether the Object.keys() functionality is available(6)", function () {
 	  _iPath.bezier({x: 50, y: 50, cp1: {x: 50}, cp2:{y:50}});
 	  // at this point the prefix has been added.

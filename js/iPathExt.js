@@ -134,6 +134,13 @@ function duoArrow(length, angle, startPt) {
     }
 }
 
+var ml=50;fr1=7;fr2=10;bl=20;width=30;
+
+characters = {
+    P : [{x:0,y:ml},{fr:fr1},{x:bl,y:20}]
+};
+
+
     words = {};
 words.a= new iPath().bezier(10, -20, 30, -55, 40, -20).smooth(-1.1, -30, -20, -30, 10).smooth(0.8, 20, 65, 30, -30).smooth(-0.7,0,60,5,60);
 words.d= new iPath().bezier(10, -20, 30, -55, 40, -20).smooth(-1.1, -30, -20, -30, 10).smooth(0.8, 30, 87, 30, -80).smooth(-0.1,0,95,0,102).smooth(2,2,5,7,0);
@@ -155,7 +162,7 @@ words.r= new iPath().bezier(2, 2, 12, -28, 18, -35).smooth(0.4, -20, 12, 35, -5)
 words.z= new iPath().bezier(2, -8, 12, 0, 18, -35).smooth(0.4, -23, 12, 31, -5).smooth(-0.4, -22, 40, -35, 60).smooth(-0.1, 5 ,-10, 23,-3).smooth(0.1, 0, 10, 10,-10);
 words.p= new iPath().bezier(10, -30, 20, -30, 15, -40).smooth(-0.2, 2, 100, -5, 100).smooth(0.2, 0, -60, 8, -80).smooth(3.3, 35, 90, 0,20).smooth(-0.38,20,10,30,0);
 //words.t= new iPath().bezier(10, -30, 20, -90, 15, -50).smooth(-0.2, -5, 60, -5, 70).smooth(-6, -15, -20, 0, -20);
-words.t= new iPath().bezier(1, -1, 20, -15, 15, -50).move(-5,20).bezier(4,4,6,6,14,3).move(-9,-23).bezier(7, -10, -12, 105, 7, 65);
+words.t= new iPath().bezier(1, -1, 20, -15, 15, -50).move(-5,20).bezier(4,4,6,6,14,3).move(-9,-23).bezier(70, -100, -12, 105, 7, 65);
 words.n= new iPath().bezier(10, -30, 12, -20, 15, -40).smooth(-0.2, -5, 50, -5, 60).smooth(-4, 0, -60, 20, -60).smooth(0.7,3,60,5,60).smooth(0.2,0,0,5,-5);
 words.u= new iPath().bezier(10, -30, 12, -20, 15, -40).smooth(-0.2, -5, 60, 8, 60).smooth(0.3, 8, 0, 15, -60).smooth(-0.7,-5,70,3,54);
 words.w= new iPath().bezier(10, -30, 12, -20, 15, -40).smooth(-3.3, 10, 80, 10, 20).smooth(-0.7,10,65,10,-10).smooth(0.2,-5,5,1,10);

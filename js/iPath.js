@@ -1020,7 +1020,15 @@ lengthBuilder.prototype.bezier = function(pt) {
     this.length += vertices.length();
 }
 
-iPath.prototype.dPath= function(significance, perc) {
+iPath.prototype.dPath= function(start, significance, perc) {
+    if (typeof start !== "object") {
+	if (significance !== undefined) {
+	    perc = significance;
+	}
+	significance = start;
+	start = null;
+    }
+    console.log(JSON.stringify([start, significance, perc]));
     var builder = new svgBuilder(significance);
     if (perc === '0' || perc === 0) {
         return '';
@@ -1035,7 +1043,7 @@ iPath.prototype.dPath= function(significance, perc) {
     this.heading = builder.heading;
     this.location = builder.location;
     builder.moveCache=[];
-    return builder.path;
+    return (start ? "M " + start.x + " " + start.y + " " : "") + builder.path;
 }
 
 reverseBuilder = function(tol) { 
