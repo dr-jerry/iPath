@@ -1534,7 +1534,7 @@ function arcPath(lines, filletRadius) {
 	    result[count-1].v = subResult.v1;
 	    if (!last) {
 		result[count+1] = {v: subResult.v2};
-	    } else {
+	    } else if (last && utils.isArc(lines[lines.length-1])) { // it is close..
 		result[0].v = subResult.v2;
 	    }
 	    if (subResult.arc) {
