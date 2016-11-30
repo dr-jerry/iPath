@@ -34,6 +34,24 @@ describe("iPath", function() {
   beforeEach(function() {
 	  _iPath = new iPath();
   });
+    it ("tests the arcPath with default filletradius", function() {
+	var ttt = {supporter_length : 240, band_thk: 18, angle: Math.PI/12, band_width: 50, thk: 12};
+	ttt.t2 = arcPath([{x:-40,y:0},{fr:88},{x:-ttt.supporter_length+60+ttt.band_thk/Math.cos(ttt.angle)+1,y:-20},{x:0,y:-15}],10);
+	expect(ttt.t2.dPath(3)).toEqual("..");
+	ttt.supporter= new iPath()//arcPath([{x:0,y:-15},{x:ttt.supporter_length-40,y:-20},{ fr:60},{x:60,y:0}, {x:-20,y:70},{fr:5}, {x:-20,y:0}], 8)
+	    .line(-1000,0)
+	    .concat(arcPath([{x:-40,y:0},{fr:88},{x:-ttt.supporter_length+60+ttt.band_thk/Math.cos(ttt.angle)+1,y:-20},{x:0,y:-15}], 7)).move(-10,35-Math.cos(ttt.angle)*ttt.band_width+ttt.thk+5)
+	    .boxEdge(180,0,{make_hole: true, pens_height: -ttt.thk, preferred_pen_length: 20, bit_radius: ttt.bit_radius, calc_pen_length: ttt.info, fit_correction: ttt.fc });
+	ttt.t2 = arcPath([{x:-40,y:0},{fr:88},{x:-ttt.supporter_length+60+ttt.band_thk/Math.cos(ttt.angle)+1,y:-20},{x:0,y:-15}],10);
+	;
+
+	expect(jasmineFix(ttt.supporter.dPath(3))).toEqual("l.-1000.0.-34.534.0.a.88.88.0.0.1.-10.891.-0.676..l.-154.941.-19.324.0.-15.m.10.3.704.l.0.-12.20.0.0.12.-20.0.m.40.0.l.0.-12.20.0.0.12.-20.0.m.40.0.l.0.-12.20.0.0.12.-20.0.m.40.0.l.0.-12.20.0.0.12.-20.0");
+	expect(jasmineFix(ttt.t2.dPath(3))).toEqual("-34.534.0.a.88.88.0.0.1.-10.891.-0.676..l.-154.941.-19.324.a.10.10.0.-15");
+    });
+    it("tests arcPath with specific r = 0, and global r > 0", function() {
+	var crn = arcPath([{x:80,y:0},{x:0,y:-80},{fr:0},{x:-160,y:-60}],10);
+	expect(jasmineFix(crn.dPath(3))).toEqual('l.70.0.a.10.10.0.0.0.10.-10..l.0.-70.-160.-60');
+    });
       it ("should display a proper curve(5)", function() {
 	  _iPath.bezier({x: 50, y: 50, cp1: {x: 50}, cp2:{y:50}});
 	  expect(_iPath.dPath({x:50, y: 50})).toEqual("M 50 50  c 50 0 0 50 50 50");
@@ -57,7 +75,7 @@ describe("iPath", function() {
 	gear.l3= arcPath(gear.l2);
 	console.log("l3 is " + JSON.stringify(gear.l3));
 	console.log("l3 is " + gear.l3.dPath());
-	expect (jasmineFix(arcPath(gear.l2).dPath(3))).toEqual('l.96.464.96.464.a.5.5.0.0.0.7.071.0..l.96.464.-96.464.20.30');
+	expect (jasmineFix(arcPath(gear.l2).dPath(3))).toEqual('l.4435.048.2710.576.-4564.952.-2485.576.-4564.952.2485.576.4435.048.-2710.576.129.904.-5196.152.129.904.5196.152');
     });
     it ("tests a very simple arcPath", function() {
 	var t1 = [{x:100,y:100},{fr:5},{x:100,y:-100},{x:20,y:30}];
@@ -546,10 +564,6 @@ describe("iPath", function() {
 	crn.dxf(dxfBuilder,  {layer: {name: 'ellen', layer_color: 1}});	
 	expect(jasmineFix(jasmineFix(dxfBuilder.blobBuilder.getText().replace(/-/g,'_')))).toEqual('0\\nPOLYLINE\\n..6\\nSOLID\\n.62\\n256\\n..8\\nellen\\n.66\\n1\\n.10\\n0.0\\n.20\\n0.0\\n.30\\n0.0\\n.70\\n0\\n..0\\nVERTEX\\n..8\\nellen\\n.10\\n0\\n.20\\n0\\n.30\\n0\\n..0\\nVERTEX\\n..8\\nellen\\n.10\\n42.426\\n.20\\n42.426\\n.30\\n0\\n..0\\n*SEQRET*\\n..0\\nPOLYLINE\\n..6\\nSOLID\\n.62\\n256\\n..8\\nellen\\n.66\\n1\\n.10\\n0.0\\n.20\\n0.0\\n.30\\n0.0\\n.70\\n0\\n..0\\nVERTEX\\n..8\\nellen\\n.10\\n70.711\\n.20\\n42.426\\n.30\\n0\\n..0\\nVERTEX\\n..8\\nellen\\n.10\\n93.536\\n.20\\n19.601\\n.30\\n0\\n..0\\n*SEQRET*\\n..0\\nPOLYLINE\\n..6\\nSOLID\\n.62\\n256\\n..8\\nellen\\n.66\\n1\\n.10\\n0.0\\n.20\\n0.0\\n.30\\n0.0\\n.70\\n0\\n..0\\nVERTEX\\n..8\\nellen\\n.10\\n101.666\\n.20\\n_25.235\\n.30\\n0\\n..0\\nVERTEX\\n..8\\nellen\\n.10\\n48.398\\n.20\\n_142.427\\n.30\\n0\\n..0\\n*SEQRET*\\n..0\\nPOLYLINE\\n..6\\nSOLID\\n.62\\n256\\n..8\\nellen\\n.66\\n1\\n.10\\n0.0\\n.20\\n0.0\\n.30\\n0.0\\n.70\\n0\\n..0\\nVERTEX\\n..8\\nellen\\n.10\\n32.223\\n.20\\n_145.36\\n.30\\n0\\n..0\\nVERTEX\\n..8\\nellen\\n.10\\n_55.154\\n.20\\n_57.983\\n.30\\n0\\n..0\\n*SEQRET*\\n..0\\nPOLYLINE\\n..6\\nSOLID\\n.62\\n256\\n..8\\nellen\\n.66\\n1\\n.10\\n0.0\\n.20\\n0.0\\n.30\\n0.0\\n.70\\n0\\n..0\\nVERTEX\\n..8\\nellen\\n.10\\n_55.154\\n.20\\n_55.154\\n.30\\n0\\n..0\\nVERTEX\\n..8\\nellen\\n.10\\n0\\n.20\\n0\\n.30\\n0\\n..0\\n*SEQRET*\\n..0\\nARC\\n..8\\nellen\\n.10\\n56.569\\n.20\\n28.284\\n.30\\n0.0\\n.40\\n20\\n.50\\n45\\n.51\\n135\\n..0\\nARC\\n..8\\nellen\\n.10\\n65.252\\n.20\\n_8.683\\n.30\\n0.0\\n.40\\n40\\n.50\\n335.556\\n.51\\n45\\n..0\\nARC\\n..8\\nellen\\n.10\\n39.294\\n.20\\n_138.289\\n.30\\n0.0\\n.40\\n10\\n.50\\n225\\n.51\\n335.556\\n..0\\nARC\\n..8\\nellen\\n.10\\n_53.74\\n.20\\n_56.569\\n.30\\n0.0\\n.40\\n2\\n.50\\n135\\n.51\\n225');
 	});
-    it("tests arcPath with specific r = 0, and global r > 0", function() {
-	var crn = arcPath([{x:80,y:0},{x:0,y:-80},{fr:0},{x:-160,y:-60}],10);
-	expect(jasmineFix(crn.dPath(3))).toEqual('l.70.0.a.10.10.0.0.0.10.-10..l.0.-70.-160.-60');
-  });
   it ("tests an arcPath with a bitRadius", function() {
       var par = arcPath([{x:-10,y:20},{br:4},{x:70,y:0},{br:4},{x:20,y:-40},{br:4},{x:-70,y:0},{br:4},{x:-10,y:20}]);
       expect(jasmineFix(par.dPath(3))).toEqual('l.-6.957.13.913.a.4.4.0.0.0.3.762.6.087..l.58.989.0.a.4.4.0.0.0.6.087.-3.762..l.15.076.-30.151.a.4.4.0.0.0.-3.762.-6.087..l.-58.989.0.a.4.4.0.0.0.-6.087.3.762..l.-8.119.16.238');
