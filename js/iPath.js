@@ -16,6 +16,10 @@
 Array.prototype.peek = function() {
     return this[this.length-1];
 }
+if (!Math.hypot) {
+    Math.hypot = function(x,y) {return Math.sqrt(x*x+y*y); }
+}
+
 var utils = function(){
   "use strict";
 
@@ -1377,7 +1381,8 @@ function extendPoint(v1) {
 // arguments are 2 vector objects and the filletRadius.
 // result is 2 adjusted vectors and the arc object {v1: {x:.. , y:.. }, v2: {x:.., y:..}, arc: {cx:.., cy:.., r:.., x:.., y:..}}
 // cx and cy is the centerpoint of the arc.
-function doCorner (v1,v2,filletRadius) {
+function doCorner (v1,v2,filletRadius, segments) {
+    console.log("segments is " + segments);
     if (filletRadius === 0) return {v1: v1, v2: v2};
     var middleAngle = bisectVectors({x:-v1.x, y:-v1.y}, {x:v2.x, y:v2.y});
     var vv1 = extendPoint(v1); //Math.atan2(v1.y, v1.x);
@@ -1392,8 +1397,9 @@ function doCorner (v1,v2,filletRadius) {
     var i2t = Math.abs(filletRadius / Math.tan(ma));
     var result = {
         v1 : { x : Math.cos(vv1.a)*(lengthV1 - i2t), y : Math.sin(vv1.a)*(lengthV1 - i2t) }
-	, v2 : { x : Math.cos(vv2.a)*(lengthV2 - i2t), y : Math.sin(vv2.a)*(lengthV2 - i2t) }
-	, arc : {
+	, v2 : { x : Math.cos(vv2.a)*(lengthV2 - i2t), y : Math.sin(vv2.a)*(lengthV2 - i2t) }};
+    if (!segments) {
+	result.arc = {
 	    dxfClockWise : crossProduct(vv1,vv2) > 0
             , r  : filletRadius
             , reverse : vv1.reverse != undefined ? vv1.reverse : ((vv1.x * vv2.y) - (vv1.y * vv2.x)) > 0
@@ -1404,7 +1410,13 @@ function doCorner (v1,v2,filletRadius) {
 	    , cx : Math.cos(middleAngle) * i2c + Math.cos(vv1.a)*(i2t)
             , cy : Math.sin(vv1.a)*(i2t) + Math.sin(middleAngle) * i2c
 	}
-    };
+    } else {
+	result.poly = [{
+            x  : i2t * (Math.cos(vv1.a) + Math.cos(vv2.a))
+	    , y  :  i2t * (Math.sin(vv1.a) + Math.sin(vv2.a))
+	}];
+    }
+
     return result;
 };
 
@@ -1455,17 +1467,16 @@ function clearCorner (v1,v2,br) {
         var earLine = extendPoint({a:endPoint.a + (result.arc.dxfClockWise ? -1 : 1) * Math.PI/2
         			       , r:Math.sqrt(secant * secant - Math.pow(bitRadius * Math.cos(diffEndCentr),2))});
         
-        result['poly'] = {
-        	l1 : {                    //(1)
+        result['poly'] = [{
         	    x : earLine.x
         	    ,y : earLine.y }
-        	, l2 : {                  //(2)
+        	, {                  //(2)
         	    x:result['arc'].x
         	    , y:result['arc'].y }
-        	,l3 : {                   //(3)
+        	, {                   //(3)
         	    x : -earLine.x
         	    , y : -earLine.y}
-        }
+			 ];
     }
     result['arc']['large_arc'] = false; //Math.abs(vv1.a-vv2.a).between(0.5 * Math.PI,1.5 * Math.PI);
     return result;
@@ -1506,7 +1517,6 @@ function arcPath(lines, filletRadius) {
     var result = [];
     var count = 0;
     var last = false;
-    	console.log("arcpath 1");
     for (var x=0; x<lines.length; x++) {
 	var subResult = undefined;
 	var extraCount = 0;
@@ -1519,9 +1529,9 @@ function arcPath(lines, filletRadius) {
 	    }
 	} else if (lines[x].fr) {
 	    if (!last) {
-		subResult = doCorner(result[count-1].v, lines[x+1], lines[x].fr);
+		subResult = doCorner(result[count-1].v, lines[x+1], lines[x].fr, lines[x].lines);
 	    } else {
-		subResult = doCorner(result[count-1].v, result[0].v, lines[x].fr);
+		subResult = doCorner(result[count-1].v, result[0].v, lines[x].fr, lines[x].lines);
 	    }
 	} else if (fillet.fr && x>0 && utils.isLine(lines[x]) && utils.isLine(lines[x-1])) {
 	    subResult = doCorner(result[count-1].v, lines[x], fillet.fr);
@@ -1529,7 +1539,6 @@ function arcPath(lines, filletRadius) {
 	    // :-(
 	    extraCount = 1;
 	}
-	console.log("arcpath 2");
 	if (subResult) {
 	    result[count-1].v = subResult.v1;
 	    if (!last) {
@@ -1551,16 +1560,14 @@ function arcPath(lines, filletRadius) {
 	}
 	count = count + 1 + extraCount;
     }
-    console.log("arcpath 3 " + JSON.stringify(result));
     var iResult = new iPath();
     for (var x=0; x<=result.length-1; x++) {
         if (result[x].v !== undefined) {
 	    iResult.line(result[x].v);
 	} else 	if (result[x].poly) {
-	    iResult
-		.line(result[x].poly.l1.x,result[x].poly.l1.y)
-		.line(result[x].poly.l2.x,result[x].poly.l2.y)
-		.line(result[x].poly.l3.x,result[x].poly.l3.y);
+	    for (var i =0; i<result[x].poly.length; i++) {
+		iResult.line(result[x].poly[i].x,result[x].poly[i].y);
+	    }
 	} else if (result[x].arc) {
 	    iResult
 		.arc(result[x].arc);

@@ -77,10 +77,15 @@ describe("iPath", function() {
 	console.log("l3 is " + gear.l3.dPath());
 	expect (jasmineFix(arcPath(gear.l2).dPath(3))).toEqual('l.4435.048.2710.576.-4564.952.-2485.576.-4564.952.2485.576.4435.048.-2710.576.129.904.-5196.152.129.904.5196.152');
     });
-    it ("tests a very simple arcPath", function() {
+     it ("tests a very simple arcPath", function() {
 	var t1 = [{x:100,y:100},{fr:5},{x:100,y:-100},{x:20,y:30}];
 //	arcPath(t1);
 	expect (jasmineFix(arcPath(t1).dPath(3))).toEqual('l.96.464.96.464.a.5.5.0.0.0.7.071.0..l.96.464.-96.464.20.30');
+    });
+     it ("tests a very simple arcPath with poly", function() {
+	 var t1 = [{x:100,y:100},{fr:5, lines:1},{x:100,y:-100},{x:20,y:30}];
+//	arcPath(t1);
+	 expect (jasmineFix(arcPath(t1).dPath(3))).toEqual('l.96.464.96.464.7.071.0.96.464.-96.464.20.30');
     });
     it ("tests a very simple poly overcut", function() {
 	var crn2 = arcPath([{x:80,y:0},{br:-5},{x:0,y:80},{x:-80,y:-80}]);
