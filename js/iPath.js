@@ -1024,6 +1024,10 @@ lengthBuilder.prototype.bezier = function(pt) {
     this.length += vertices.length();
 }
 
+lengthBuilder.prototype.arc = function(arc) {
+    console.log(JSON.stringify(arc));
+    this.lenghth += (arc.a1 - arc.a2) * Math.PI * 2 *arc.r;
+}
 iPath.prototype.dPath= function(start, significance, perc) {
     if (typeof start !== "object") {
 	if (significance !== undefined) {

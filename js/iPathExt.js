@@ -140,20 +140,25 @@ characters = {
     P : [{x:0,y:ml},{fr:fr1},{x:bl,y:20}]
 };
 
+// A good way to improve fluent characters is to experiment wit variable split beziers
+// hello.b2p = new Bezier2Poly(0.01);
+// hello.hresult = hello.b2p.splitBezier([{x:36,y:-35},{x:-10,y:-200},{x:10,y:20}], hello.perc);
+// console.log("h is " + JSON.stringify(hello.hresult));
+// words.H = new iPath().bezier(hello.hresult.b1[0].x, hello.hresult.b1[0].y,hello.hresult.b1[1].x, hello.hresult.b1[1].y,hello.hresult.b1[2].x, hello.hresult.b1[2].y)
+//    .bezier(hello.hresult.b2[0].x, hello.hresult.b2[0].y,hello.hresult.b2[1].x, hello.hresult.b2[1].y,hello.hresult.b2[2].x, hello.hresult.b2[2].y).smooth(hello.sm, 35, -45, 22, -10);
 
     words = {};
 words.a= new iPath().bezier(10, -20, 30, -55, 40, -20).smooth(-1.1, -30, -20, -30, 10).smooth(0.8, 20, 65, 30, -30).smooth(-0.7,0,60,5,60);
 words.d= new iPath().bezier(10, -20, 30, -55, 40, -20).smooth(-1.1, -30, -20, -30, 10).smooth(0.8, 30, 87, 30, -80).smooth(-0.1,0,95,0,102).smooth(2,2,5,7,0);
 words.g= new iPath().bezier(10, -20, 30, -55, 40, -20).smooth(-1.1, -30, -20, -30, 10).smooth(0.8, 20, 65, 30, -30).smooth(-0.7,0,110,-20,110).smooth(1.1,10,-50,20,-60)
-    words.j= new iPath().bezier(10, -30, 20, -45, 15, -37).move(-2,-20).line(5,5).move(-3,15).bezier(0,20,10,90,-10,90).smooth(1.1,10,-50,20,-60)
-    words.i= new iPath().bezier(10, -30, 20, -45, 15, -37).move(-2,-20).line(5,5).move(-3,15).bezier(7, -10, -2, 50, 7, 55);
+words.j= new iPath().bezier(10, -30, 20, -45, 15, -37).move(-2,-20).line(5,5).move(-3,15).bezier(0,20,10,90,-10,90).smooth(1.1,18,-38,20,-40)
+    words.i= new iPath().bezier(10, -30, 20, -45, 15, -37).move(-2,-20).line(5,5).move(-3,15).bezier(7, -10, -2, 50, 7, 0);
 words.e= new iPath().bezier(10, 0, 30, 5, 30, -30).smooth(0.15, -10, -35, -20, 20).smooth(0.6, 0, 35, 20, 20);
 words.l= new iPath().bezier(12, 0, 33, 0, 30, -40).smooth(3.5, -20, 55, -7, 59);
 words.b= new iPath().bezier(6, -4, 23, 0, 28, -40).smooth(2.5, -10, -41, -12, 30).smooth(0.7, 19, 23, 22, -4).smooth(1.4, -15, -2, 1, 0);
 
 words.f= new iPath().bezier(6, -4, 23, 0, 28, -40).smooth(2.5, -10, -41, -12, 60).smooth(0.7, 19, 23, 9, -14).smooth(1.4, -15, -2, 5, 0);
-
-words.h= new iPath().bezier(6, -10, 23, 0, 32, -50).smooth(2.5, -10, -41, -12, 70).smooth(-0.6, 27, -45, 22, -10).smooth(0.65,3,4,3,1);
+words.h= new iPath().bezier(14.4 , -14, 15.68, -48.8, 13.312, -71.44).bezier(-3.552, -33.96, -15.312, -40.56,-3.3112, 91.44).smooth(-0.7, 35, -45, 22, -10);
 words.P = new iPath().bezier(2, 12, 5, 0, 5, -100).move(-5,10).bezier(60,-10, 80,10,-3,40).move(10,58)
 
 words.k= new iPath().bezier(6, -10, 23, 0, 25, -50).smooth(2.5, -10, -41, -12, 70).smooth(-1.2, 45, 15, 4, -30).smooth(-0.4,0,40,25,25);;//.smooth(1,3,3,5,4);
