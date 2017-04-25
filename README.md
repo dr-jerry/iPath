@@ -16,4 +16,4 @@ where 3 represents the significance of the generated numbers. Above example is a
 - beziers and continuation with a weight.
 
 
-More information on http://www.stretchsketch.com/presentation/ipath.html . iPath with real live usecases on http://wwww.stretchsketch.com
+More information on http://www.stretchsketch.com/presentation/ipath.html . iPath with real live usecases on http://www.stretchsketch.com
