@@ -596,7 +596,6 @@ iPath.prototype.reverse= function(arg) {
     }
 
 iPath.prototype.rotate= function() {
-    console.log('rotate 1');
 	var rotatePoint = function(pt, angle) {
 	    return {x : (pt.x * Math.cos(angle) - pt.y* Math.sin(angle))
 			, y : (pt.x * Math.sin(angle) + pt.y* Math.cos(angle)) }
@@ -1025,7 +1024,6 @@ lengthBuilder.prototype.bezier = function(pt) {
 }
 
 lengthBuilder.prototype.arc = function(arc) {
-    console.log(JSON.stringify(arc));
     this.lenghth += (arc.a1 - arc.a2) * Math.PI * 2 *arc.r;
 }
 iPath.prototype.dPath= function(start, significance, perc) {
@@ -1036,7 +1034,6 @@ iPath.prototype.dPath= function(start, significance, perc) {
 	significance = start;
 	start = null;
     }
-    console.log(JSON.stringify([start, significance, perc]));
     var builder = new svgBuilder(significance);
     if (perc === '0' || perc === 0) {
         return '';
