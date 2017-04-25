@@ -7,7 +7,7 @@ creates a rectangle which can be assigned to an existing d attribute of an exist
 
     document.queryselector("path.class").setAttribute("d", rect.dPath(3));
 
-where 3 represents the significance of the generate numbers. Above example is a very simple usecase for iPath. iPath has more usecase:
+where 3 represents the significance of the generated numbers. Above example is a very simple usecase for iPath. iPath has more improvements over SVG:
 
 - polar coordinates
 - closing with mirroring
@@ -16,4 +16,4 @@ where 3 represents the significance of the generate numbers. Above example is a 
 - beziers and continuation with a weight.
 
 
-More information on http://www.stretchsketch.com/presentation/iPath.html . iPath with real live usecases on http://wwww.stretchsketch.com
+More information on http://www.stretchsketch.com/presentation/ipath.html . iPath with real live usecases on http://wwww.stretchsketch.com
