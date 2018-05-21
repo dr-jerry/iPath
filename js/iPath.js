@@ -1507,11 +1507,11 @@ function reflectPath(lines, vector) {
     return result;
 }
 	    
-	    /*
-	      if br = negative, the t-bone fillet is a 3 line extension instead of an arc. (The bit radius remains the same.
-	      fr is default filletradius.
+/*
+  if br = negative, the t-bone fillet is a 3 line extension instead of an arc. (The bit radius remains the same.
+  fr is default filletradius.
 
-	    */
+*/
 
 function arcPath(lines, filletRadius) {
     var fillet = (filletRadius !== undefined ? {fr: filletRadius} : {fr:false});
