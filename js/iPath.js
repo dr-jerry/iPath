@@ -1486,11 +1486,12 @@ function clearCorner (v1,v2,br) {
 
 /*
 returns a new array lines with the original lines, appended with original lines, reversed and mirrored in vector)
+if ditchOrig is true the original lines are ditched.
+
 */
-
-
-function reflectPath(lines, vector) {
-    var result = utils.extend(true, [], lines);
+function reflectPath(lines, vector, ditchOrig) {
+    
+    var result = ditchOrig ? [] : utils.extend(true, [], lines);
     var n = utils.normalize(vector)
     var length = lines.length- (utils.isArc(lines.peek()) ? 2 : 1);
     for (var x=length; x>=0; x--) {
