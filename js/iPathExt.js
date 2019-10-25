@@ -117,7 +117,8 @@ iPath.prototype.squareHole= function(h, b, options) {
 }
 
 function duoArrow(length, angle, startPt) {
-    var l = [{x:0,y:4},{x:-3,y:-4},{x:3,y:-4},{x:0,y:4},{x:length-6,y:0},{x:0,y:4},{x:3,y:-4},{x:-3,y:-4},{x:0,y:4}];
+    // duoArrow also defined in svg_functions.js
+    var l = [{x:30,y:40},{x:0,y:-80},{x:-30,y:40},{x:length,y:0},{x:-3,y:-4},{x:0,y:8},{x:3,y:-4}];
     for (i = 0;i<l.length;i++) {
 	l[i] = {x: l[i].x * Math.cos(angle) - l[i].y * Math.sin(angle)
 		, y: l[i].x * Math.sin(angle) + l[i].y * Math.cos(angle)};
@@ -153,10 +154,15 @@ words.d= new iPath().bezier(10, -20, 30, -55, 40, -20).smooth(-1.1, -30, -20, -3
 words.g= new iPath().bezier(10, -20, 30, -55, 40, -20).smooth(-1.1, -30, -20, -30, 10).smooth(0.8, 20, 65, 30, -30).smooth(-0.7,0,110,-20,110).smooth(1.1,10,-50,20,-60)
 words.j= new iPath().bezier(10, -30, 20, -45, 15, -37).move(-2,-20).line(5,5).move(-3,15).bezier(0,20,10,90,-10,90).smooth(1.1,18,-38,20,-40)
     words.i= new iPath().bezier(10, -30, 20, -45, 15, -37).move(-2,-20).line(5,5).move(-3,15).bezier(-2, 2, -2, 64, 7, 55);
-words.e= new iPath().bezier(10, 0, 30, 5, 30, -30).smooth(0.15, -10, -35, -20, 20).smooth(0.6, 0, 35, 20, 20);
-words.l= new iPath().bezier(12, 0, 33, 0, 30, -40).smooth(3.5, -20, 55, -7, 59);
-words.b= new iPath().bezier(6, -4, 23, 0, 28, -40).smooth(2.5, -10, -41, -12, 30).smooth(0.7, 19, 23, 22, -4).smooth(1.4, -15, -2, 1, 0);
+words.e= new iPath().bezier(10, 0, 30, 5, 30, -30).smooth(0.12, -10, -35, -20, 20).smooth(0.6, -1.9199999999999995, 32.96, 14.784, 26.848);
+//-1.5300000000000002, 33.7025, 18.0795, 25.55525);
+//0, 35, 30, 20);
+//-4.800000000000001, 26.400000000000002, -1.9199999999999995, 32.96, 14.784, 26.848);
+//
 
+
+words.l= new iPath().bezier(9, 0, 33, 0, 30, -40).smooth(3.5, -20, 55, -7, 59);
+words.b= new iPath().bezier(6, -4, 23, 0, 28, -40).smooth(2.5, -10, -41, -12, 30).smooth(0.7, 19, 23, 22, -4).smooth(1.4, -15, -2, 1, 0);
 words.f= new iPath().bezier(6, -4, 23, 0, 28, -40).smooth(2.5, -10, -41, -12, 60).smooth(0.7, 19, 23, 9, -14).smooth(1.4, -15, -2, 5, 0);
 words.h= new iPath().bezier(14.4 , -14, 15.68, -48.8, 13.312, -71.44).bezier(-3.552, -33.96, -15.312, -40.56,-3.3112, 91.44).smooth(-0.7, 35, -45, 22, -10);
 words.P = new iPath().bezier(2, 12, 5, 0, 5, -100).move(-5,10).bezier(60,-10, 80,10,-3,40).move(10,58)
@@ -215,7 +221,8 @@ words.form=function(w) {
 		    return true;
 		});
 	    result.move(20,-1* movement.y);
-	});
+    });
+
     return result; 
 }
 

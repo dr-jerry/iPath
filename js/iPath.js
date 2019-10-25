@@ -1383,7 +1383,6 @@ function extendPoint(v1) {
 // result is 2 adjusted vectors and the arc object {v1: {x:.. , y:.. }, v2: {x:.., y:..}, arc: {cx:.., cy:.., r:.., x:.., y:..}}
 // cx and cy is the centerpoint of the arc.
 function doCorner (v1,v2,filletRadius, segments) {
-    console.log("segments is " + segments);
     if (filletRadius === 0) return {v1: v1, v2: v2};
     var middleAngle = bisectVectors({x:-v1.x, y:-v1.y}, {x:v2.x, y:v2.y});
     var vv1 = extendPoint(v1); //Math.atan2(v1.y, v1.x);
