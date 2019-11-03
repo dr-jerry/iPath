@@ -831,6 +831,11 @@ Bezier2Poly.prototype.normalize = function(v) {
 // be aware that the argument is destructively modified. Call splitBezier(array.slice(0)) if you need to keep the original array.
 //
 Bezier2Poly.prototype.splitBezier = function(array, perc) {
+    if (perc === 0) {
+	return {b2: array, b1: [{x:0, y:0},{x:0, y:0},{x:0, y:0}]};
+    } else if (perc === 1) {
+	return {b1: array, b2: [{x:0, y:0},{x:0, y:0},{x:0, y:0}]};
+    }
     array.unshift({x:0, y:0});
     var coll = [];
     while (array.length > 0) {
