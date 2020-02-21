@@ -148,7 +148,7 @@ characters = {
 // words.H = new iPath().bezier(hello.hresult.b1[0].x, hello.hresult.b1[0].y,hello.hresult.b1[1].x, hello.hresult.b1[1].y,hello.hresult.b1[2].x, hello.hresult.b1[2].y)
 //    .bezier(hello.hresult.b2[0].x, hello.hresult.b2[0].y,hello.hresult.b2[1].x, hello.hresult.b2[1].y,hello.hresult.b2[2].x, hello.hresult.b2[2].y).smooth(hello.sm, 35, -45, 22, -10);
 
-    words = {};
+words = {};
 words.a= new iPath().bezier(10, -20, 30, -55, 40, -20).smooth(-1.1, -30, -20, -30, 10).smooth(0.8, 20, 65, 30, -30).smooth(-0.7,0,60,5,60);
 words.d= new iPath().bezier(10, -20, 30, -55, 40, -20).smooth(-1.1, -30, -20, -30, 10).smooth(0.8, 30, 87, 30, -80).smooth(-0.1,0,95,0,102).smooth(2,2,5,7,0);
 words.g= new iPath().bezier(10, -20, 30, -55, 40, -20).smooth(-1.1, -30, -20, -30, 10).smooth(0.8, 20, 65, 30, -30).smooth(-0.7,0,110,-20,110).smooth(1.1,10,-50,20,-60)

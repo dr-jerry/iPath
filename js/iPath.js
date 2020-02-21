@@ -1120,7 +1120,6 @@ Blobber.prototype.getText= function(){
 	      if (i>-1 && i < this.path.length) {
 		  result = this.path[i];
 	      }
-	      console.log("result is " + result);
 	      if (result && result.prefix === 'l') {
 		  return result;
 	      }
@@ -1434,7 +1433,6 @@ function clearCorner (v1,v2,br) {
     var vv1 = extendPoint(v1); //Math.atan2(v1.y, v1.x);
     var vv2 = extendPoint(v2); //Math.atan2(v2.y, v2.x);
     if (Math.abs(vv1.a - vv2.a) < utils.EPSILON) {
-	console.log("@@@@smaller");
 	return { x:vv1.x + vv2.x, y:vv1.y + vv2.y };
     }
     var ma = Math.abs(vv1.a - vv2.a+Math.PI)/2;
@@ -1456,7 +1454,6 @@ function clearCorner (v1,v2,br) {
 	}
     }
     if (Math.abs(utils.hypotenuse(vv1, vv2) < utils.EPSILON)) {
-	console.log("@@@@smaller");
 	return { x:vv1.x + vv2.x, y:vv1.y + vv2.y };
     }
 
@@ -1535,9 +1532,17 @@ function arcPath(lines, filletRadius) {
 	    }
 	} else if (lines[x].fr) {
 	    if (!last) {
-		subResult = doCorner(result[count-1].v, lines[x+1], lines[x].fr, lines[x].lines);
+		if (lines[x].fr > 0 ) {
+		    subResult = doCorner(result[count-1].v, lines[x+1], lines[x].fr, lines[x].lines)
+		} else {
+		    subResult = clearCorner(result[count-1].v, lines[x+1], -lines[x].fr);
+		}
 	    } else {
-		subResult = doCorner(result[count-1].v, result[0].v, lines[x].fr, lines[x].lines);
+		if (lines[x].fr > 0) {
+		    subResult = doCorner(result[count-1].v, result[0].v, lines[x].fr, lines[x].lines)
+		} else {
+		    subResult = clearCorner(result[count-1].v, result[0].v, -lines[x].fr);
+		}
 	    }
 	} else if (fillet.fr && x>0 && utils.isLine(lines[x]) && utils.isLine(lines[x-1])) {
 	    subResult = doCorner(result[count-1].v, lines[x], fillet.fr);
