@@ -71,7 +71,8 @@ var utils = function(){
 
     return key === undefined || hasOwn.call( obj, key );
   };
-
+    //Copyright J Resig, JQuery.fn.extend,
+    //copied here to make iPath independencies.
   var _extend = function() {
     var options, name, src, copy, copyIsArray, clone,
       target = arguments[0] || {},
@@ -582,11 +583,12 @@ iPath.prototype.reverse= function(arg) {
 		// if only last element is of type iPath it is a destructive call.
 		return iPath.prototype.scale.apply(pt, args);
 	    }
-            if (typeof sc === 'object' && (sc.x && sc.y)) {
-	       return { x: sc.x * pt.x, y: sc.y * pt.y };
+	    const factor = (typeof sc === 'number') ? {x: sc, y: sc} : {x: sc.x, y:sc.y};
+	    if (pt.prefix === 'a') {
+		return utils.extend({cx: factor.x * pt.cx, cy: factor.y * pt.cy, r: pt.r * factor.x}, pt)
 	    } else {
-	       return {x : sc * pt.x, 
-		       y : sc * pt.y};
+	       return {x : factor.x * pt.x, 
+		       y : factor.y * pt.y};
             }
 	}
 	var args = Array.prototype.slice.call(arguments)
@@ -1377,7 +1379,7 @@ function extendPoint(v1) {
 
 //              lc
 //  ______________
-//           oo   \ intersection2Tangent(length)
+//           oo  /\ intersection2Tangent(length)
 //              oo \
 //                 o\
 //                  o\
@@ -1403,6 +1405,8 @@ function doCorner (v1,v2,filletRadius, segments) {
         v1 : { x : Math.cos(vv1.a)*(lengthV1 - i2t), y : Math.sin(vv1.a)*(lengthV1 - i2t) }
 	, v2 : { x : Math.cos(vv2.a)*(lengthV2 - i2t), y : Math.sin(vv2.a)*(lengthV2 - i2t) }};
     if (!segments) {
+	max = Math.cos(middleAngle);
+	may = Math.sin(middleAngle);
 	result.arc = {
 	    dxfClockWise : crossProduct(vv1,vv2) > 0
             , r  : filletRadius
@@ -1411,8 +1415,11 @@ function doCorner (v1,v2,filletRadius, segments) {
 	    , y  :  i2t * (Math.sin(vv1.a) + Math.sin(vv2.a))
             , a1 : vv1.a
             , a2 : vv2.a
-	    , cx : Math.cos(middleAngle) * i2c + Math.cos(vv1.a)*(i2t)
-            , cy : Math.sin(vv1.a)*(i2t) + Math.sin(middleAngle) * i2c
+	    , cx : max * i2c + Math.cos(vv1.a)*(i2t)
+            , cy : Math.sin(vv1.a)*(i2t) + may * i2c
+	    , max: max
+	    , may: may
+	    , i2c : i2c // Intersection to center Circle (length)
 	}
     } else {
 	result.poly = [{
@@ -1532,9 +1539,12 @@ function arcPath(lines, filletRadius) {
 	    }
 	} else if (lines[x].fr) {
 	    if (!last) {
+//		console.log("cornering" +  lines[x].fr);
 		if (lines[x].fr > 0 ) {
+//		    console.log("bigger");
 		    subResult = doCorner(result[count-1].v, lines[x+1], lines[x].fr, lines[x].lines)
 		} else {
+//		    console.log("smaller");
 		    subResult = clearCorner(result[count-1].v, lines[x+1], -lines[x].fr);
 		}
 	    } else {
